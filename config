@@ -1,0 +1,8 @@
+-- | Оптимизируемый белок
+mol_ouf   = molecule_for_optimization.pdb
+
+-- | Аминокислоты, участвующие в оптимизации
+resid_ouf = residue_for_optimization
+
+-- | Оптимизированный белок
+mol_inf = optimizated_molecule.pdb
