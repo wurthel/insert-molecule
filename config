@@ -1,20 +1,8 @@
--- Имя файла структуры со структурой ZMatrix
-zmatrix = 1M0L_zmatrix
+-- | Оптимизируемый белок
+mol_ouf   = molecule_for_optimization.pdb
 
--- Имя файла молекулы в формате pdb
-molecule = 1M0L.pdb
+-- | Аминокислоты, участвующие в оптимизации
+resid_ouf = residue_for_optimization
 
--- Число атомов, которое мы вставляем без оптимизации
-n_without_opt = 5
-
--- Диапазон атомов, которое мы вставляем с оптимизацией
-n_with_opt = (6, 10)
-
--- | Файл для чтения белка после процесса оптимизации
-molecule_opt_aft = N
-
--- | Имя файла оптимизируемой молекулы
-molecule_opt_beh = M
-
--- | Имя файла оптимизируемой молекулы (resid)
-resid_opt = L
+-- | Оптимизированный белок
+mol_inf = optimizated_molecule.pdb
