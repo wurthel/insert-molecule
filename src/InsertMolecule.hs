@@ -26,7 +26,7 @@ import qualified Data.List as List
 import qualified System.IO.Strict as StrictIO
 
 import Utils
-import Config (mol_inf, mol_ouf, resid_ouf)
+
 
 -- | НАЧАЛО. ОПИСАНИЕ ТИПОВ.
 type CompAccur = Double
@@ -110,12 +110,12 @@ setAtomWithOutOptimization n zmatr mol =
 -- | Функция предназначена для последовательной вставки
 -- атомов молекулы из @zmatr@, находящихся в строках [s, e],
 -- c процессом оптимизации. В качестве результата возвращается молекула после всех вставок
-setAtomWithOptimization :: Int -> Int -> ZMatrix -> Molecule -> IO Molecule
-setAtomWithOptimization s e zmatr mol
+setAtomWithOptimization :: (FilePath, FilePath, FilePath) -> (Int, Int) -> ZMatrix -> Molecule -> IO Molecule
+setAtomWithOptimization fns (s, e) zmatr mol
     | s < 0 || e < 0 = error "setAtomWithOptimization: @s@ and @e@ must be great than 0"
     | s > e = return mol
-    | otherwise = do mol' <- setAtomWithOptimization3 s zmatr mol
-                     mol' `seq` setAtomWithOptimization (s+1) e zmatr mol'
+    | otherwise = do mol' <- setAtomWithOptimization3 fns s zmatr mol
+                     mol' `seq` setAtomWithOptimization fns ((s+1), e) zmatr mol'
 
 -- | Функция предназначена для вставки
 -- первого атома молекулы из @zmatrix@ без процесса оптимизации.
@@ -323,8 +323,8 @@ setAtomWithOutOptimization3 n zmatrix originMol insMol =
 -- | Функция предназначена для вставки
 -- третьего и всех последующих атомов молекулы из @zmatrix@ с процесом оптимизации.
 -- Вовзращает ОДИН возможный вариант молекулы со вставкой.
-setAtomWithOptimization3 :: Int -> ZMatrix -> Molecule -> IO Molecule
-setAtomWithOptimization3 n zmatrix molecule =
+setAtomWithOptimization3 :: (FilePath, FilePath, FilePath) -> Int -> ZMatrix -> Molecule -> IO Molecule
+setAtomWithOptimization3 (mol_of, res_of, mol_if) n zmatrix molecule =
     do
     let matrixAtom_D = zmatrix !! n
         atomID_D     = fromJust $ get atomid   matrixAtom_D
@@ -406,18 +406,18 @@ setAtomWithOptimization3 n zmatrix molecule =
         atomsForOptim  = filter (isIntersection possibleCoord) wsMolecule
         resSeqForOptim = List.delete (get resseq possibleCoord) . List.nub $ map (get resseq) atomsForOptim
     let time_wait = 5000000
-        wait False = return ()
-        wait True  = do 
-            e <- doesFileExist mol_inf 
-            if e then wait False
-            else threadDelay time_wait >> wait True
-    writeMolecule mol_ouf molecule'
-    writeFile resid_ouf $ unlines $ show <$> resSeqForOptim
-    wait True
-    molecule'' <- readMolecule mol_inf
-    removeFile mol_ouf
-    removeFile mol_inf
-    removeFile resid_ouf
+        wait _ False = return ()
+        wait fn True  = do 
+            e <- doesFileExist fn 
+            if e then wait fn False
+            else threadDelay time_wait >> wait fn True
+    writeMolecule mol_of molecule'
+    writeFile res_of $ unlines $ show <$> resSeqForOptim
+    wait mol_if True
+    molecule'' <- readMolecule mol_if
+    removeFile mol_of
+    removeFile res_of
+    removeFile mol_if
     return molecule''
 
 -- | Функция сортирует координаты так, чтобы вектора
