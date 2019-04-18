@@ -1,0 +1,8 @@
+.stack-work/
+.gitattributes
+.DS_Store
+debug.txt
+ChangeLog.md
+package.yaml
+Setup.hs
+insert-molecule.cabal
