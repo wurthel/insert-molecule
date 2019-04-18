@@ -13,7 +13,7 @@ insertMolecule = do
     molecule   <- readMolecule molecule_fn
     let n  = n_without_opt
         se = n_with_opt
-        fns = (tmp_mol_ouf, tmp_resid_ouf, tmp_mol_inf)
+        fns = (opt_mol_beh, opt_resid, opt_script, opt_mol_aft)
     let molecule' = fromMaybe (error "insertMolecule: returned Nothing") 
                     $ setAtomWithOutOptimization n zmatrix molecule
     molecule'' <- setAtomWithOptimization fns se zmatrix molecule'

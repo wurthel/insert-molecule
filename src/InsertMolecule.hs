@@ -19,6 +19,7 @@ import Data.Maybe
 import System.IO
 import System.Directory (removeFile, doesFileExist, renameFile)
 import System.IO.Unsafe
+import System.Process
 import Control.Concurrent
 
 import qualified Data.Map as Map
@@ -110,7 +111,7 @@ setAtomWithOutOptimization n zmatr mol =
 -- | Функция предназначена для последовательной вставки
 -- атомов молекулы из @zmatr@, находящихся в строках [s, e],
 -- c процессом оптимизации. В качестве результата возвращается молекула после всех вставок
-setAtomWithOptimization :: (FilePath, FilePath, FilePath) -> (Int, Int) -> ZMatrix -> Molecule -> IO Molecule
+setAtomWithOptimization :: (FilePath, FilePath, FilePath, FilePath) -> (Int, Int) -> ZMatrix -> Molecule -> IO Molecule
 setAtomWithOptimization fns (s, e) zmatr mol
     | s < 0 || e < 0 = error "setAtomWithOptimization: @s@ and @e@ must be great than 0"
     | s > e = return mol
@@ -323,8 +324,8 @@ setAtomWithOutOptimization3 n zmatrix originMol insMol =
 -- | Функция предназначена для вставки
 -- третьего и всех последующих атомов молекулы из @zmatrix@ с процесом оптимизации.
 -- Вовзращает ОДИН возможный вариант молекулы со вставкой.
-setAtomWithOptimization3 :: (FilePath, FilePath, FilePath) -> Int -> ZMatrix -> Molecule -> IO Molecule
-setAtomWithOptimization3 (mol_of, res_of, mol_if) n zmatrix molecule =
+setAtomWithOptimization3 :: (FilePath, FilePath, FilePath, FilePath) -> Int -> ZMatrix -> Molecule -> IO Molecule
+setAtomWithOptimization3 (mol_of, res_of, opt_script, mol_if) n zmatrix molecule =
     do
     let matrixAtom_D = zmatrix !! n
         atomID_D     = fromJust $ get atomid   matrixAtom_D
@@ -384,7 +385,7 @@ setAtomWithOptimization3 (mol_of, res_of, mol_if) n zmatrix molecule =
         -- | Вставляем @atom_C@ в @molecule@
         -- | Функция, задающая координаты атома @atom_C@  в единой СК
         -- по углу alpha в дважды штрихованной СК.
-        possibleCoord =
+        possibleAtom =
             let h     =  distance_BC * sind (angle_BCD)
                 x''_D = -distance_CD * cosd (angle_BCD) + distance_BC
                 y''_D = -h * sind (b3 + angle_ABCD)
@@ -393,9 +394,9 @@ setAtomWithOptimization3 (mol_of, res_of, mol_if) n zmatrix molecule =
                 y_D   =  x''_D*sind(b1)*cosd(b2) + y''_D*cosd(b1) + z''_D*sind(b1)*sind(b2) + y_B
                 z_D   = -x''_D*sind(b2)          + 0              + z''_D*cosd(b2)          + z_B
             in  set coordin (x_D, y_D, z_D) atom_D
-    let molecule' = Map.insert atomID_D possibleCoord molecule
-        (x_D, y_D, z_D) = get coordin possibleCoord
-        r_D = get radius possibleCoord
+    let molecule' = Map.insert atomID_D possibleAtom molecule
+        (x_D, y_D, z_D) = get coordin possibleAtom
+        r_D = get radius possibleAtom
         m = 1
         r1 = (,,) (x_D - m * r_D) (y_D - m * r_D) (z_D - m * r_D)
         r2 = (,,) (x_D + m * r_D) (y_D - m * r_D) (z_D - m * r_D)
@@ -403,17 +404,11 @@ setAtomWithOptimization3 (mol_of, res_of, mol_if) n zmatrix molecule =
         r4 = (,,) (x_D - m * r_D) (y_D - m * r_D) (z_D + m * r_D)
         ws = sortCoordinates [r1,r2,r3,r4]
         wsMolecule     = Map.elems $ Map.filter (`isInWorkSpace` ws) molecule'
-        atomsForOptim  = filter (isIntersection possibleCoord) wsMolecule
-        resSeqForOptim = List.delete (get resseq possibleCoord) . List.nub $ map (get resseq) atomsForOptim
-    let time_wait = 5000000
-        wait _ False = return ()
-        wait fn True  = do 
-            e <- doesFileExist fn 
-            if e then wait fn False
-            else threadDelay time_wait >> wait fn True
+        atomsForOptim  = filter (isIntersection possibleAtom) wsMolecule
+        resSeqForOptim = List.delete (get resseq possibleAtom) . List.nub $ map (get resseq) atomsForOptim
     writeMolecule mol_of molecule'
     writeFile res_of $ unlines $ show <$> resSeqForOptim
-    wait mol_if True
+    callCommand ("./" <> opt_script)
     molecule'' <- readMolecule mol_if
     removeFile mol_of
     removeFile res_of
@@ -459,6 +454,7 @@ readMolecule inf = return $ foldr addAtom newMolecule atoms
         txt   = unsafePerformIO $ StrictIO.readFile inf
         atoms = [(id, Atom name resname resseq coordin elem radius) |
                  line <- lines txt,
+                 (List.head . List.words $ line) `List.elem` ["ATOM", "HETATM"],
                  let fields  = words line
                      id      = read $ fields !! 1
                      name    = fields !! 2
