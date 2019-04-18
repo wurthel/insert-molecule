@@ -42,14 +42,18 @@ n_without_opt = get "n_without_opt" read
 n_with_opt :: (Int, Int)
 n_with_opt = get "n_with_opt" read 
 
--- | Файл для чтения белка после процесса оптимизации
-tmp_mol_inf :: String
-tmp_mol_inf = get "molecule_opt_aft" id
+-- | Скрипт, запускающий оптимизацию
+opt_script :: String
+opt_script = get "opt_script" id
 
--- | Имя файла оптимизируемой молекулы
-tmp_mol_ouf :: String
-tmp_mol_ouf = get "molecule_opt_beh" id
+-- | PDB файл оптимизируемой молекулы
+opt_mol_beh :: String
+opt_mol_beh = get "opt_mol_beh" id
+
+-- | PDB файл оптимизированной молекулы
+opt_mol_aft :: String
+opt_mol_aft = get "opt_mol_aft" id
 
 -- | Имя файла оптимизируемой молекулы (resid)
-tmp_resid_ouf :: String
-tmp_resid_ouf = get "resid_opt" id
+opt_resid :: String
+opt_resid = get "opt_resid" id

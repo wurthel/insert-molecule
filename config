@@ -1,8 +1,8 @@
 — Вставляемая молекула в Z-матричном представлении
-zmatrix = 1M0L_zmatrix
+zmatrix = test/Retinal/1M0L_zmatrix
 
 — Молекула, в которую производится вставка
-molecule = 1M0L.pdb
+molecule = test/Retinal/1M0L.pdb
 
 — Результат работы программы
 molecule_result = RESULT.pdb
@@ -13,11 +13,14 @@ n_without_opt = 5
 — Диапазон атомов, вставка которых производится С оптимизацией
 n_with_opt = (6, 10)
 
-— | PDB файла оптимизируемой молекулы
-molecule_opt_beh = M
+— | Скрипт, запускающий оптимизацию
+opt_script = optimization-script/relax.sh
+
+— | PDB файл оптимизируемой молекулы
+opt_mol_beh = optimization-script/1M0L.pdb
+
+— | PDB файл оптимизированной молекулы
+opt_mol_aft = optimization-script/1M0L_0.pdb
 
 — | Файла, куда выводятся требующие оптимизации аминокислоты
-resid_opt = L
-
-— | PDB файла оптимизированной молекулы
-molecule_opt_aft = N
+opt_resid = optimization-script/N
