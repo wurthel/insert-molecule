@@ -5,7 +5,6 @@ Setup.hs
 insert-molecule.cabal
 optimization-script/*
 !optimization-script/create.pgn
-!optimization-script/fixate_h.pgn
 !optimization-script/fixate_ret.pgn
 !optimization-script/m1.conf
 !optimization-script/mout.pgn
