@@ -1,5 +1,5 @@
 — Молекула, в которую производится вставка
-molecule = data/proteins/1M0L.1.pdb
+molecule = data/proteins/1M0L.pdb
 
 — Результат работы программы
 molecule_result = 1M0L_result.pdb
