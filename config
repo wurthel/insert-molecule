@@ -8,10 +8,10 @@ molecule = ../test/Retinal/1M0L.pdb
 molecule_result = ../RESULT.pdb
 
 — Число первых атомов, вставка которых производится БЕЗ оптимизации
-n_without_opt = 5
+n_without_opt = 0
 
 — Диапазон атомов, вставка которых производится С оптимизацией
-n_with_opt = (6, 10)
+n_with_opt = (1, 5)
 
 — | Скрипт, запускающий оптимизацию
 opt_script = relax.sh

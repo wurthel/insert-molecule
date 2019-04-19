@@ -99,7 +99,7 @@ addAtom (id, atom) molecule = Map.insert id atom molecule
 -- В качестве результата возвращается первая молекулу, в которую удалось
 -- вставить @n@ атомов. Если такой молекулы не нашлось, то возвращается Nothing
 setAtomWithOutOptimization :: Int -> ZMatrix -> Molecule -> Maybe Molecule
-setAtomWithOutOptimization 0 _ mol     = mol
+setAtomWithOutOptimization 0 _ mol     = pure mol
 setAtomWithOutOptimization n zmatr mol =
     listToMaybe $ setAtomWithOutOptimization' 1 n zmatr mol newMolecule
     where setAtomWithOutOptimization' m n zmatr originMol insMol
@@ -407,16 +407,19 @@ setAtomWithOptimization3 (mol_of, res_of, opt_script, mol_if) n zmatrix molecule
         wsMolecule     = Map.elems $ Map.filter (`isInWorkSpace` ws) molecule'
         atomsForOptim  = filter (isIntersection possibleAtom) wsMolecule
         resSeqForOptim = List.delete (get resseq possibleAtom) . List.nub $ map (get resseq) atomsForOptim
-    writeMolecule mol_of molecule'
-    writeFile res_of $ unlines $ show <$> resSeqForOptim
-    callCommand ("sed -i \"s/ASH/ASP/g; s/GLH/GLU/g\" 1M0L.pdb")
-    callCommand ("sh " <> opt_script)
-    !molecule'' <- readMolecule mol_if
-    print "OK"
-    removeFile mol_of
-    removeFile res_of
-    removeFile mol_if
-    return molecule''
+    if null resSeqForOptim then return molecule' else
+        do 
+        writeMolecule mol_of molecule'
+        writeFile res_of $ unlines $ show <$> resSeqForOptim
+        callCommand ("sed -i \"s/ASH/ASP/g; s/GLH/GLU/g\" 1M0L.pdb")
+        callCommand ("sh " <> opt_script)
+        !molecule'' <- readMolecule mol_if
+        print "OK"
+        --callCommand ("sleep 1000")
+        removeFile mol_of
+        removeFile res_of
+        removeFile mol_if
+        return molecule''
 
 -- | Функция сортирует координаты так, чтобы вектора
 -- r0r1, r0r2, r0r3 образовывали правую тройку.

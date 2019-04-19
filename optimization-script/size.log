@@ -7,7 +7,7 @@ Info)    Molecular Dynamics', J. Molec. Graphics 1996, 14.1, 33-38.
 Info) -------------------------------------------------------------
 Info) Multithreading available, 4 CPUs detected.
 Info)   CPU features: SSE2 
-Info) Free system memory: 2671MB (47%)
+Info) Free system memory: 2544MB (45%)
 Info) Creating CUDA device pool and initializing hardware...
 CUDA error: invalid device symbol, CUDAClearDevice.cu line 56
 Info) Detected 1 available CUDA accelerator:
@@ -18,8 +18,8 @@ Info) Using plugin pdb for structure file 1M0L_wi.pdb
 Info) Using plugin pdb for coordinates from file 1M0L_wi.pdb
 Info) Determining bond structure from distance search ...
 Info) Analyzing structure ...
-Info)    Atoms: 3593
-Info)    Bonds: 3644
+Info)    Atoms: 3582
+Info)    Bonds: 3641
 Info)    Angles: 0  Dihedrals: 0  Impropers: 0  Cross-terms: 0
 Info)    Bondtypes: 0  Angletypes: 0  Dihedraltypes: 0  Impropertypes: 0
 Info)    Residues: 227
@@ -29,8 +29,8 @@ Info)    Fragments: 1   Protein: 1   Nucleic: 0
 Info) Finished with coordinate file 1M0L_wi.pdb.
 0
 atomselect0
-{-1.4490000009536743 13.973999977111816 -23.433000564575195} {31.631999969482422 58.518001556396484 35.04100036621094}
-16.614349365234375 38.34363555908203 6.27672004699707
+{-1.6679999828338623 14.343999862670898 -23.5} {31.48200035095215 58.70100021362305 35.119998931884766}
+16.594593048095703 38.37200164794922 6.28887939453125
 Info) VMD for LINUXAMD64, version 1.9.3 (November 30, 2016)
 Info) Exiting normally.
 vmd > 
