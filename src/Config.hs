@@ -43,6 +43,10 @@ n_with_opt :: (Int, Int)
 n_with_opt = get "n_with_opt" read 
 
 -- | Скрипт, запускающий оптимизацию
+opt_path :: String
+opt_path = get "opt_path" id
+
+-- | Скрипт, запускающий оптимизацию
 opt_script :: String
 opt_script = get "opt_script" id
 
