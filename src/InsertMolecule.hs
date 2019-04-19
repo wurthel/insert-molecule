@@ -157,7 +157,7 @@ setAtomWithOutOptimization1 n zmatrix originMol insMol =
                 y_B = distance_AB*sind(a)*sind(b) + y_A
                 z_B = distance_AB*cosd(b)         + z_A
             in  (x_B, y_B, z_B) `deepseq` set coordin (x_B, y_B, z_B) atom_B
-    let alpha = [Degree 0, Degree 5 .. Degree 375]
+    let alpha = [Degree 0, Degree 5 .. Degree 355]
         beta  = [Degree 0, Degree 5 .. Degree 175]
         allVariance = possibleCoord <$> alpha <*> beta
     goodVariance <- filter (\x -> not . or $ isIntersection <$> wsMolecule <*> pure x) allVariance
@@ -520,9 +520,9 @@ readZMatrix inf = return $ zmatrix
 
 getRadius :: Element -> CompAccur
 getRadius elem =
-     case elem of "C" -> 1.100 -- // Заменено с 1.782
-                  "H" -> 0.001 -- // Заменено с 0.200
-                  "N" -> 1.100 -- // Заменено с 1.648
-                  "O" -> 1.100 -- // Заменено с 1.510
-                  "S" -> 1.100 -- // Заменено с 1.782
+     case elem of "C" -> 1.000 -- // Заменено с 1.782
+                  "H" -> 0.200 -- // Заменено с 0.200
+                  "N" -> 1.000 -- // Заменено с 1.648
+                  "O" -> 1.000 -- // Заменено с 1.510
+                  "S" -> 1.000 -- // Заменено с 1.782
 -- | КОНЕЦ. ЧТЕНИЕ, ВЫВОД.

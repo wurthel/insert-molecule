@@ -1,19 +1,19 @@
-— Вставляемая молекула в Z-матричном представлении
-zmatrix = test/Retinal/1M0L_zmatrix
-
 — Молекула, в которую производится вставка
-molecule = test/Retinal/1M0L.pdb
+molecule = data/proteins/1M0L.1.pdb
 
 — Результат работы программы
-molecule_result = RESULT.pdb
+molecule_result = 1M0L_result.pdb
+
+— Вставляемая молекула в Z-матричном представлении
+zmatrix = data/zmatrix
 
 — Число первых атомов, вставка которых производится БЕЗ оптимизации
-n_without_opt = 10
+n_without_opt = 0 
 
 — Диапазон атомов, вставка которых производится С оптимизацией
-n_with_opt = (11, 19)
+n_with_opt = (1, 21)
 
-— | Путь к скрипту с оптимизацией, запускающий оптимизацию
+— | Путь к скрипту с оптимизацией
 opt_path = optimization-script/
 
 — | Скрипт, запускающий оптимизацию
