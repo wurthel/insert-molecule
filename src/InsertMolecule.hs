@@ -408,8 +408,10 @@ setAtomWithOptimization3 (mol_of, res_of, opt_script, mol_if) n zmatrix molecule
         resSeqForOptim = List.delete (get resseq possibleAtom) . List.nub $ map (get resseq) atomsForOptim
     writeMolecule mol_of molecule'
     writeFile res_of $ unlines $ show <$> resSeqForOptim
-    callCommand ("./" <> opt_script)
-    molecule'' <- readMolecule mol_if
+    callCommand ("sed -i \"s/ASH/ASP/g; s/GLH/GLU/g\" 1M0L.pdb")
+    callCommand ("sh " <> opt_script)
+    !molecule'' <- readMolecule mol_if
+    print "OK"
     removeFile mol_of
     removeFile res_of
     removeFile mol_if
