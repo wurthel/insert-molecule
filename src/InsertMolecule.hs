@@ -99,6 +99,7 @@ addAtom (id, atom) molecule = Map.insert id atom molecule
 -- В качестве результата возвращается первая молекулу, в которую удалось
 -- вставить @n@ атомов. Если такой молекулы не нашлось, то возвращается Nothing
 setAtomWithOutOptimization :: Int -> ZMatrix -> Molecule -> Maybe Molecule
+setAtomWithOutOptimization 0 _ mol     = mol
 setAtomWithOutOptimization n zmatr mol =
     listToMaybe $ setAtomWithOutOptimization' 1 n zmatr mol newMolecule
     where setAtomWithOutOptimization' m n zmatr originMol insMol
