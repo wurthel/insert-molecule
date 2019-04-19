@@ -17,7 +17,8 @@ import Text.Read (readMaybe)
 import Text.Printf
 import Data.Maybe
 import System.IO
-import System.Directory (removeFile, doesFileExist, renameFile)
+import System.Directory (removeFile, doesFileExist, renameFile, 
+                         setCurrentDirectory, getCurrentDirectory)
 import System.IO.Unsafe
 import System.Process
 import Control.Concurrent
@@ -112,7 +113,7 @@ setAtomWithOutOptimization n zmatr mol =
 -- | Функция предназначена для последовательной вставки
 -- атомов молекулы из @zmatr@, находящихся в строках [s, e],
 -- c процессом оптимизации. В качестве результата возвращается молекула после всех вставок
-setAtomWithOptimization :: (FilePath, FilePath, FilePath, FilePath) -> (Int, Int) -> ZMatrix -> Molecule -> IO Molecule
+setAtomWithOptimization :: (FilePath, FilePath, FilePath, FilePath, FilePath) -> (Int, Int) -> ZMatrix -> Molecule -> IO Molecule
 setAtomWithOptimization fns (s, e) zmatr mol
     | s < 0 || e < 0 = error "setAtomWithOptimization: @s@ and @e@ must be great than 0"
     | s > e = return mol
@@ -325,8 +326,8 @@ setAtomWithOutOptimization3 n zmatrix originMol insMol =
 -- | Функция предназначена для вставки
 -- третьего и всех последующих атомов молекулы из @zmatrix@ с процесом оптимизации.
 -- Вовзращает ОДИН возможный вариант молекулы со вставкой.
-setAtomWithOptimization3 :: (FilePath, FilePath, FilePath, FilePath) -> Int -> ZMatrix -> Molecule -> IO Molecule
-setAtomWithOptimization3 (mol_of, res_of, opt_script, mol_if) n zmatrix molecule =
+setAtomWithOptimization3 :: (FilePath, FilePath, FilePath, FilePath, FilePath) -> Int -> ZMatrix -> Molecule -> IO Molecule
+setAtomWithOptimization3 (mol_of, res_of, opt_path, opt_script, mol_if) n zmatrix molecule =
     do
     let matrixAtom_D = zmatrix !! n
         atomID_D     = fromJust $ get atomid   matrixAtom_D
@@ -409,6 +410,8 @@ setAtomWithOptimization3 (mol_of, res_of, opt_script, mol_if) n zmatrix molecule
         resSeqForOptim = List.delete (get resseq possibleAtom) . List.nub $ map (get resseq) atomsForOptim
     if null resSeqForOptim then return molecule' else
         do 
+        cur_dir <- getCurrentDirectory
+        setCurrentDirectory (cur_dir <> "/" <> opt_path)
         writeMolecule mol_of molecule'
         writeFile res_of $ unlines $ show <$> resSeqForOptim
         callCommand ("sed -i \"s/ASH/ASP/g; s/GLH/GLU/g\" 1M0L.pdb")
@@ -419,6 +422,7 @@ setAtomWithOptimization3 (mol_of, res_of, opt_script, mol_if) n zmatrix molecule
         removeFile mol_of
         removeFile res_of
         removeFile mol_if
+        setCurrentDirectory cur_dir
         return molecule''
 
 -- | Функция сортирует координаты так, чтобы вектора
