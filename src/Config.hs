@@ -10,10 +10,9 @@ type Config = [(String, String)]
 readConfig :: Config
 readConfig = 
     let s = unsafePerformIO t
-        t = do 
-                args <- getArgs
-                let config_fn = args !! 0
-                readFile config_fn
+        t = do args <- getArgs
+               let config_fn = args !! 0
+               readFile config_fn
     in  [(key, val) | 
         line <- filter (\x -> (not $ "--" `isPrefixOf` x) && x /= "" ) . lines $ s,
         let (key, val) = (\x -> (head x, unwords . drop 2 $ x)) . words $ line]
