@@ -17,7 +17,7 @@ n_with_opt = (1, 21)
 opt_path = optimization-script/
 
 — | Скрипт, запускающий оптимизацию
-opt_script = bash relax.sh
+opt_script = sed -i \"s/ASH/ASP/g; s/GLH/GLU/g\" 1M0L.pdb; bash relax.sh
 
 — | PDB файл оптимизируемой молекулы
 opt_mol_beh = 1M0L.pdb
