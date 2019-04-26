@@ -416,12 +416,12 @@ setAtomWithOptimization3 (mol_of, res_of, opt_path, opt_script, mol_if) n zmatri
         writeFile res_of $ unlines $ show <$> resSeqForOptim
         callCommand (opt_script)
         putStr "optimization_script: OK\n"
-        !molecule'' <- readMolecule mol_if
-        removeFile mol_of
-        removeFile res_of
-        removeFile mol_if
+        molecule'' <- readMolecule mol_if
+        -- removeFile mol_of
+        -- removeFile res_of
+        -- removeFile mol_if
         setCurrentDirectory cur_dir
-        return molecule''
+        molecule'' `seq` return molecule''
 
 -- | Функция сортирует координаты так, чтобы вектора
 -- r0r1, r0r2, r0r3 образовывали правую тройку.
