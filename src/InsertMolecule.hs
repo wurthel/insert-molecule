@@ -415,7 +415,7 @@ setAtomWithOptimization3 (mol_of, res_of, opt_path, opt_script, mol_if) n zmatri
         writeMolecule mol_of molecule'
         writeFile res_of $ unlines $ show <$> resSeqForOptim
         callCommand ("sed -i \"s/ASH/ASP/g; s/GLH/GLU/g\" 1M0L.pdb")
-        callCommand ("sh " <> opt_script)
+        callCommand (opt_script)
         !molecule'' <- readMolecule mol_if
         print "OK"
         --callCommand ("sleep 1000")
