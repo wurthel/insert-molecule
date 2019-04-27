@@ -5,7 +5,7 @@ molecule = data/proteins/1M0L.pdb
 molecule_result = 1M0L_result.pdb
 
 — Вставляемая молекула в Z-матричном представлении
-zmatrix = data/zmatrix
+zmolecule = data/zmatrix
 
 — Число первых атомов, вставка которых производится БЕЗ оптимизации
 n_without_opt = 0 

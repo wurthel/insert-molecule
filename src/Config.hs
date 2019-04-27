@@ -22,9 +22,9 @@ get key f = case lookup key readConfig of
     Nothing -> error ("get: not found: " ++ key)
     Just x  -> f x
 
--- Имя файла структуры со структурой ZMatrix
-zmatrix_fn :: String
-zmatrix_fn = get "zmatrix" id 
+-- Имя файла структуры со структурой ZMolecule
+zmolecule_fn :: String
+zmolecule_fn = get "zmolecule" id 
 
 -- Имя файла молекулы в формате pdb
 molecule_fn :: String
