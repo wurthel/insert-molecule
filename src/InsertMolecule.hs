@@ -5,7 +5,7 @@ module InsertMolecule
     ( setAtomWithOutOptimization
     , setAtomWithOptimization
     , readMolecule
-    , readZMatrix
+    , readZMolecule
     , writeMolecule
     ) where
 
@@ -19,79 +19,15 @@ import Data.Maybe
 import System.IO
 import System.Directory (removeFile, doesFileExist, renameFile, 
                          setCurrentDirectory, getCurrentDirectory)
-import System.IO.Unsafe
-import System.Process
+import System.IO.Unsafe (unsafePerformIO)
+import System.Process (callCommand)
 import Control.Concurrent
-
 import qualified Data.Map as Map
 import qualified Data.List as List
 import qualified System.IO.Strict as StrictIO
 
 import Utils
-
-
--- | НАЧАЛО. ОПИСАНИЕ ТИПОВ.
-type CompAccur = Double
-type ID        = Int
-type Point     = (CompAccur, CompAccur, CompAccur)
-type Name      = String
-type Element   = String
-type Radius    = CompAccur
-
-data ZElement = ZElement { _atom      :: Atom
-                         , _atomid    :: Maybe ID
-                         , _atomcon   :: Maybe ID
-                         , _bonddist  :: Maybe CompAccur
-                         , _anglcon   :: Maybe ID
-                         , _bondangl  :: Maybe CompAccur
-                         , _dihedcon  :: Maybe ID
-                         , _dihedangl :: Maybe CompAccur
-                         } deriving Show
-type ZMatrix  = [ZElement]
-
-data Atom = Atom { _name     :: Name
-                 , _resname  :: Name
-                 , _resseq   :: ID
-                 , _coordin  :: Point
-                 , _element  :: Element
-                 , _radius   :: Radius
-                 } deriving Show
-type Molecule = Map.Map ID Atom
-
-mkLabels [''Atom, ''ZElement]
--- | КОНЕЦ. ОПИСАНИЕ ТИПОВ.
-
--- | НАЧАЛО. КОНСТРУКТОРЫ.
--- Простейшие конструкторы пустых значений типов
-newZElement :: ZElement
-newZElement = ZElement { _atom      = newAtom
-                       , _atomid    = Nothing
-                       , _atomcon   = Nothing
-                       , _bonddist  = Nothing
-                       , _anglcon   = Nothing
-                       , _bondangl  = Nothing
-                       , _dihedcon  = Nothing
-                       , _dihedangl = Nothing
-                       }
-
-newZMatrix :: ZMatrix
-newZMatrix = mempty
-
-newAtom :: Atom
-newAtom = Atom { _name    = []
-               , _resname = []
-               , _resseq  = 0
-               , _coordin = (0, 0, 0)
-               , _element = []
-               , _radius  = 0
-               }
-
-newMolecule :: Molecule
-newMolecule = Map.empty
-
-addAtom :: (ID, Atom) -> Molecule -> Molecule
-addAtom (id, atom) molecule = Map.insert id atom molecule
--- | КОНЕЦ. КОНСТРУКТОРЫ.
+import Types
 
 -- | НАЧАЛО. ВСТАВКА МОЛЕКУЛЫ.
 -- | Функция предназначена для последовательной вставки
@@ -99,7 +35,7 @@ addAtom (id, atom) molecule = Map.insert id atom molecule
 -- без процесса оптимизации.
 -- В качестве результата возвращается первая молекулу, в которую удалось
 -- вставить @n@ атомов. Если такой молекулы не нашлось, то возвращается Nothing
-setAtomWithOutOptimization :: Int -> ZMatrix -> Molecule -> Maybe Molecule
+setAtomWithOutOptimization :: Int -> ZMolecule -> Molecule -> Maybe Molecule
 setAtomWithOutOptimization 0 _ mol     = pure mol
 setAtomWithOutOptimization n zmatr mol =
     listToMaybe $ setAtomWithOutOptimization' 1 n zmatr mol newMolecule
@@ -113,7 +49,7 @@ setAtomWithOutOptimization n zmatr mol =
 -- | Функция предназначена для последовательной вставки
 -- атомов молекулы из @zmatr@, находящихся в строках [s, e],
 -- c процессом оптимизации. В качестве результата возвращается молекула после всех вставок
-setAtomWithOptimization :: (FilePath, FilePath, FilePath, FilePath, FilePath) -> (Int, Int) -> ZMatrix -> Molecule -> IO Molecule
+setAtomWithOptimization :: (FilePath, FilePath, FilePath, FilePath, FilePath) -> (Int, Int) -> ZMolecule -> Molecule -> IO Molecule
 setAtomWithOptimization fns (s, e) zmatr mol
     | s < 0 || e < 0 = error "setAtomWithOptimization: @s@ and @e@ must be great than 0"
     | s > e = return mol
@@ -121,13 +57,13 @@ setAtomWithOptimization fns (s, e) zmatr mol
                      mol' `seq` setAtomWithOptimization fns ((s+1), e) zmatr mol'
 
 -- | Функция предназначена для вставки
--- первого атома молекулы из @zmatrix@ без процесса оптимизации.
+-- первого атома молекулы из @ZMolecule@ без процесса оптимизации.
 -- Возвращает ВСЕ возможные варианты молекул со вставкой.
 -- Если таковых нет, то возвращается пустой список.
-setAtomWithOutOptimization1 :: Int -> ZMatrix -> Molecule -> Molecule -> [Molecule]
-setAtomWithOutOptimization1 n zmatrix originMol insMol =
+setAtomWithOutOptimization1 :: Int -> ZMolecule -> Molecule -> Molecule -> [Molecule]
+setAtomWithOutOptimization1 n zMol originMol insMol =
     do
-    let matrixAtom_B = zmatrix !! n
+    let matrixAtom_B = zMol !! n
         atomID_B     = fromJust $ get atomid   matrixAtom_B
         atomID_A     = fromJust $ get atomcon  matrixAtom_B
         distance_AB  = fromJust $ get bonddist matrixAtom_B
@@ -164,13 +100,13 @@ setAtomWithOutOptimization1 n zmatrix originMol insMol =
     return $ Map.insert atomID_B goodVariance insMol
 
 -- | Функция предназначена для вставки
--- второго атома молекулы из @zmatrix@ без процесса оптимизации.
+-- второго атома молекулы из @ZMolecule@ без процесса оптимизации.
 -- Вовзращает ВСЕ возможные варианты молекул со вставкой.
 -- Если таковых нет, то возвращается пустой список.
-setAtomWithOutOptimization2 :: Int -> ZMatrix -> Molecule -> Molecule -> [Molecule]
-setAtomWithOutOptimization2 n zmatrix originMol insMol =
+setAtomWithOutOptimization2 :: Int -> ZMolecule -> Molecule -> Molecule -> [Molecule]
+setAtomWithOutOptimization2 n zMol originMol insMol =
     do
-    let matrixAtom_C = zmatrix !! n
+    let matrixAtom_C = zMol !! n
         atomID_C     = fromJust $ get atomid   matrixAtom_C
         atomID_B     = fromJust $ get atomcon  matrixAtom_C
         atomID_A     = fromJust $ get anglcon  matrixAtom_C
@@ -234,13 +170,13 @@ setAtomWithOutOptimization2 n zmatrix originMol insMol =
     return $ Map.insert atomID_C goodVariance insMol
 
 -- | Функция предназначена для вставки
--- третьего и всех последующих атомов молекулы из @zmatrix@ без процесса оптимизации.
+-- третьего и всех последующих атомов молекулы из @ZMolecule@ без процесса оптимизации.
 -- Вовзращает ОДИН возможный вариант молекулы со вставкой.
 -- Если такового нет, то возвращается пустой список.
-setAtomWithOutOptimization3 :: Int -> ZMatrix -> Molecule -> Molecule -> [Molecule]
-setAtomWithOutOptimization3 n zmatrix originMol insMol =
+setAtomWithOutOptimization3 :: Int -> ZMolecule -> Molecule -> Molecule -> [Molecule]
+setAtomWithOutOptimization3 n zMol originMol insMol =
     do
-    let matrixAtom_D = zmatrix !! n
+    let matrixAtom_D = zMol !! n
         atomID_D     = fromJust $ get atomid   matrixAtom_D
         atomID_C     = fromJust $ get atomcon  matrixAtom_D
         atomID_B     = fromJust $ get anglcon  matrixAtom_D
@@ -324,12 +260,12 @@ setAtomWithOutOptimization3 n zmatrix originMol insMol =
     return $ Map.insert atomID_D goodVariance insMol
 
 -- | Функция предназначена для вставки
--- третьего и всех последующих атомов молекулы из @zmatrix@ с процесом оптимизации.
+-- третьего и всех последующих атомов молекулы из @ZMolecule@ с процесом оптимизации.
 -- Вовзращает ОДИН возможный вариант молекулы со вставкой.
-setAtomWithOptimization3 :: (FilePath, FilePath, FilePath, FilePath, FilePath) -> Int -> ZMatrix -> Molecule -> IO Molecule
-setAtomWithOptimization3 (mol_of, res_of, opt_path, opt_script, mol_if) n zmatrix molecule =
+setAtomWithOptimization3 :: (FilePath, FilePath, FilePath, FilePath, FilePath) -> Int -> ZMolecule -> Molecule -> IO Molecule
+setAtomWithOptimization3 (mol_of, res_of, opt_path, opt_script, mol_if) n zMol molecule =
     do
-    let matrixAtom_D = zmatrix !! n
+    let matrixAtom_D = zMol !! n
         atomID_D     = fromJust $ get atomid   matrixAtom_D
         atomID_C     = fromJust $ get atomcon  matrixAtom_D
         atomID_B     = fromJust $ get anglcon  matrixAtom_D
@@ -460,17 +396,17 @@ readMolecule :: FilePath -> IO Molecule
 readMolecule inf = return $ foldr addAtom newMolecule atoms
     where
         txt   = unsafePerformIO $ StrictIO.readFile inf
-        atoms = [(id, Atom name resname resseq coordin elem radius) |
+        atoms = [(id, Atom elem etype resname resseq coordin radius) |
                  line <- lines txt,
                  (List.head . List.words $ line) `List.elem` ["ATOM", "HETATM"],
                  let fields  = words line
-                     id      = read $ fields !! 1
-                     name    = fields !! 2
-                     elem    = take 1 name
-                     resname = fields !! 3
-                     resseq  = read $ fields !! 5
+                     id      = ID      $ read $ fields !! 1
+                     etype   = Type    $ fields !! 2
+                     elem    = Element $ take 1 $ fields !! 2
+                     resname = Resname $ fields !! 3
+                     resseq  = Resseq  $ read $ fields !! 5
                      coordin = (read $ fields !! 6, read $ fields !! 7, read $ fields !! 8)
-                     radius  = getRadius elem]
+                     radius  = vdwr elem]
 
 writeMolecule :: FilePath -> Molecule -> IO ()
 writeMolecule ouf (!molecule) = do
@@ -480,47 +416,48 @@ writeMolecule ouf (!molecule) = do
     renameFile tmp_name ouf
     where writeAtom hdl (id, atom) =
             let record  = "ATOM"
-                serial  = id
-                aname   = get name atom
+                (ID serial)  = id
+                (Type atype) = get etype atom
                 altLoc  = ' '
-                altname = get resname atom
+                (Resname altName) = get resname atom
                 chainid = 'A'
-                resSeq  = get resseq atom
+                (Resseq resSeq) = get resseq atom
                 icode   = ' '
                 (x,y,z) = get coordin atom
                 occupan = 0.0 :: Double
                 tempfac = 0.0 :: Double
                 pattern = "%-6s%5d %4s%1c%3s %1c%4d%1c   %8.3f%8.3f%8.3f%6.2f%6.2f\n"
-            in hPrintf hdl pattern record serial aname altLoc altname chainid resSeq icode x y z occupan tempfac
+            in hPrintf hdl pattern record serial atype altLoc altName chainid resSeq icode x y z occupan tempfac
 
 -- | Функция считывает Z-матрицу из файла
-readZMatrix :: FilePath -> IO ZMatrix
-readZMatrix inf = return $ zmatrix
-    where
-        txt     = unsafePerformIO $ StrictIO.readFile inf
-        zmatrix = [ZElement atom atomid atomcon bonddist anglcon bondangl dihedcon dihedangl |
+readZMolecule :: FilePath -> IO ZMolecule
+readZMolecule inf = return zmolecule
+    where txt = unsafePerformIO $ StrictIO.readFile inf
+          zmolecule = 
+                   [ZAtom atom atomid atomcon bonddist anglcon bondangl dihedcon dihedangl |
                    line <- lines txt,
-                   let fields = words line
-                       atomid    = readMaybe $ fields !! 0
-                       atomcon   = readMaybe $ fields !! 1
-                       bonddist  = readMaybe $ fields !! 2
-                       anglcon   = readMaybe $ fields !! 3
-                       bondangl  = readMaybe $ fields !! 4
-                       dihedcon  = readMaybe $ fields !! 5
-                       dihedangl = readMaybe $ fields !! 6
-                       name      = fields !! 7
-                       element   = take 1 name
+                   let fields    = words line
+                       atomid    = (readMaybe $ fields !! 0) >>= return . ID
+                       atomcon   = (readMaybe $ fields !! 1) >>= return . ID
+                       bonddist  = readMaybe  $ fields !! 2
+                       anglcon   = (readMaybe $ fields !! 3) >>= return . ID
+                       bondangl  = readMaybe  $ fields !! 4
+                       dihedcon  = (readMaybe $ fields !! 5) >>= return . ID
+                       dihedangl = readMaybe  $ fields !! 6
+                       etype     = Type       $ fields !! 7
+                       elem      = Element    $ take 1 $ fields !! 7
                        coordin   = (0, 0, 0)
-                       radius    = getRadius element
-                       resname   = fields !! 8
-                       resid     = read $ fields !! 9
-                       atom      = Atom name resname resid coordin element radius]
+                       radius    = vdwr elem
+                       resname   = Resname   $ fields !! 8
+                       resseq    = Resseq    $ read $ fields !! 9
+                       atom      = Atom elem etype resname resseq coordin radius]
 
-getRadius :: Element -> CompAccur
-getRadius elem =
-     case elem of "C" -> 1.000 -- // Заменено с 1.782
-                  "H" -> 0.200 -- // Заменено с 0.200
-                  "N" -> 1.000 -- // Заменено с 1.648
-                  "O" -> 1.000 -- // Заменено с 1.510
-                  "S" -> 1.000 -- // Заменено с 1.782
+-- | Возвращает Ван-дер-Вальсов радиус атома
+vdwr :: Element -> CompAccur
+vdwr (Element e) = 
+    case e of "C" -> 1.000 -- // Заменено с 1.782
+              "H" -> 0.200 -- // Заменено с 0.200
+              "N" -> 1.000 -- // Заменено с 1.648
+              "O" -> 1.000 -- // Заменено с 1.510
+              "S" -> 1.000 -- // Заменено с 1.782
 -- | КОНЕЦ. ЧТЕНИЕ, ВЫВОД.
