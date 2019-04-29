@@ -349,10 +349,10 @@ setAtomWithOptimization3 (mol_of, res_of, opt_path, opt_script, mol_if) n zMol m
         cur_dir <- getCurrentDirectory
         setCurrentDirectory (cur_dir <> "/" <> opt_path)
         writeMolecule mol_of molecule'
-        writeFile res_of $ unlines $ show <$> resSeqForOptim
+        writeFile res_of $ unlines $ (\(Resseq x) -> show x) <$> resSeqForOptim
         callCommand (opt_script)
         putStr "optimization_script: OK\n"
-        molecule'' <- readMolecule mol_if
+        !molecule'' <- readMolecule mol_if
         -- removeFile mol_of
         -- removeFile res_of
         -- removeFile mol_if
