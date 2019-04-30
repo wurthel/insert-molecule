@@ -1,7 +1,25 @@
 #!/bin/bash
+filename='N'
+zamm=1
+while read p; do
+    echo $p > C_$zamm
+    zamm=$(($zamm+1))
+done < $filename
 
+prosa=""
+for ((jok=1; jok <= zamm-1; jok++)) do
+    tropp=$(cat C_$jok)
+    fropp=$(($tropp + 1))
+    cropp=$(($tropp - 1))
+    fropp1=$(($tropp + 2))
+    cropp1=$(($tropp + 2))
+    prosa="$tropp $fropp $cropp $fropp1 $cropp1 $prosa"
+done
+echo $prosa > finale
+#sed -i "s/and$//" finale
+resnum=$(cat finale)
+rm C_* finale
 
-resnum=$(cat N)
 sed "s/NNN/$resnum/g" fixate_ret.pgn > fixate_h.pgn
 tail -1 1M0L.pdb > hitme
 awk '{print $3}' hitme >  hitme1
@@ -409,6 +427,9 @@ grep "C2  $rename" 1M0L_0.pdb > C2-1
 grep "C1  $rename" 1M0L_0.pdb > C1-1
 grep "C17 $rename" 1M0L_0.pdb > C17-1
 grep "C16 $rename" 1M0L_0.pdb > C16-1
+grep "CE  $rename" 1M0L_0.pdb > CE 
+grep "CD  $rename" 1M0L_0.pdb > CD
+grep "CG  $rename" 1M0L_0.pdb > CG
 
 sed -i "/HZ1 $rename/d" 1M0L_0.pdb
 sed -i "/H151 $rename/d" 1M0L_0.pdb
@@ -483,6 +504,13 @@ awk '{print $2}' C2-1 >  c2_1
 awk '{print $2}' C1-1 >  c1_1
 awk '{print $2}' C17-1 > c17_1
 awk '{print $2}' C16-1 > c16_1
+awk '{print $2}' CE > c-e
+awk '{print $2}' CD > c-d
+awk '{print $2}' CG > c-g
+
+ces=$(cat c-e)
+cds=$(cat c-d)
+cgs=$(cat c-g)
 
 nz_1=$(cat nz_1)
 c15_1=$(cat c15_1)
@@ -554,10 +582,13 @@ cat C1-1 >> 1M0L_0.pdb
 cat C17-1 >> 1M0L_0.pdb
 cat C16-1 >> 1M0L_0.pdb
 
-
 sed -i "s/$rename/REL/g" 1M0L_0.pdb
+
+sed -i "s/${ces}/4002/g" 1M0L_0.pdb
+sed -i "s/${cds}/4001/g" 1M0L_0.pdb
+sed -i "s/${cgs}/4000/g" 1M0L_0.pdb
+
 
 rm NZ-1 C15-1 C14-1 C13-1 C20-1 C12-1 C11-1 C10-1 C9-1 C19-1 C8-1 C7-1 C6-1 C5-1 C4-1 C3-1 C2-1 C1-1 C18-1 C17-1 C16-1
 rm nz_1 c15_1 c14_1 c13_1 c20_1 c12_1 c11_1 c10_1 c9_1 c19_1 c8_1 c7_1 c6_1 c5_1 c4_1 c3_1 c2_1 c1_1 c18_1 c17_1 c16_1
-
 
