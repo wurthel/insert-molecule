@@ -3,6 +3,7 @@
 debug.txt
 Setup.hs
 insert-molecule.cabal
+
 optimization-script/*
 !optimization-script/create.pgn
 !optimization-script/fixate_ret.pgn
@@ -12,3 +13,8 @@ optimization-script/*
 !optimization-script/relax.sh
 !optimization-script/size.pgn
 !optimization-script/top_all27_prot_lipid_P.inp
+
+data/proteins/
+!data/proteins/1M0L.pdb
+!data/proteins/R82A.pdb
+!data/proteins/Y185FT.pdb

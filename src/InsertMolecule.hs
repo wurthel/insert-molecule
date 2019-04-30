@@ -349,7 +349,7 @@ setAtomWithOptimization3 (mol_of, res_of, opt_path, opt_script, mol_if) n zMol m
         cur_dir <- getCurrentDirectory
         setCurrentDirectory (cur_dir <> "/" <> opt_path)
         writeMolecule mol_of molecule'
-        writeFile res_of $ unlines $ (\(Resseq x) -> show x) <$> resSeqForOptim
+        appendFile res_of (unlines $ (\(Resseq x) -> show x) <$> resSeqForOptim)
         callCommand (opt_script)
         putStr "optimization_script: OK\n"
         !molecule'' <- readMolecule mol_if
@@ -455,7 +455,7 @@ readZMolecule inf = return zmolecule
 -- | Возвращает Ван-дер-Вальсов радиус атома
 vdwr :: Element -> CompAccur
 vdwr (Element e) = 
-    case e of "C" -> 1.000 -- // Заменено с 1.782
+    case e of "C" -> 2.000 -- // Заменено с 1.782
               "H" -> 0.200 -- // Заменено с 0.200
               "N" -> 1.000 -- // Заменено с 1.648
               "O" -> 1.000 -- // Заменено с 1.510
