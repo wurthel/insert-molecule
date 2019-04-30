@@ -3,9 +3,11 @@ module Main where
 import InsertMolecule
 import Config
 import Data.Maybe (fromMaybe)
+import System.Directory (doesFileExist, removeFile)
+import Control.Monad
 
 main :: IO ()
-main = do insertMolecule
+main = insertMolecule
 
 insertMolecule :: IO ()
 insertMolecule = do
@@ -14,6 +16,7 @@ insertMolecule = do
     let n   = n_without_opt
         se  = n_with_opt
         fns = (opt_mol_beh, opt_resid, opt_path, opt_script, opt_mol_aft)
+    mapM_ ((\fn -> join $ when <$> doesFileExist fn <*> pure (removeFile fn)) . (opt_path <> )) [opt_mol_beh, opt_resid, opt_mol_aft]
     let molecule' = fromMaybe (error "insertMolecule: returned Nothing") 
                     $ setAtomWithOutOptimization n zmolecule molecule
     molecule'' <- setAtomWithOptimization fns se zmolecule molecule'
