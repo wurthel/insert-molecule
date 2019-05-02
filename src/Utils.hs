@@ -5,7 +5,9 @@ module Utils where
 -- | НАЧАЛО. ТРИГОНОМЕТРИЯ
 -- Предназчен для работы с тригонометрическими фукциями
 -- с градусами в аргументе
-newtype Degree a = Degree a deriving (Num, Enum, Show, Eq, Ord, Fractional)
+newtype Degree a =
+  Degree a
+  deriving (Num, Enum, Show, Eq, Ord, Fractional)
 
 toDegree :: Floating a => a -> Degree a
 toDegree = Degree
@@ -17,7 +19,7 @@ deg2Rad :: Floating a => Degree a -> a
 deg2Rad = \(Degree x) -> x * pi / 180
 
 cosd :: Floating a => Degree a -> a
-cosd = cos . deg2Rad 
+cosd = cos . deg2Rad
 
 sind :: Floating a => Degree a -> a
 sind = sin . deg2Rad
