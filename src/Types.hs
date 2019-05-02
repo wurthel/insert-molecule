@@ -99,5 +99,5 @@ newZMolecule :: ZMolecule
 newZMolecule = mempty
 
 addAtom :: (ID, Atom) -> Molecule -> Molecule
-addAtom (id, atom) molecule = Map.insert id atom molecule
+addAtom (id, atom) = Map.insert id atom
 -- | КОНЕЦ. КОНСТРУКТОРЫ.

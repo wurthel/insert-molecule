@@ -1,5 +1,6 @@
 .stack-work
 .DS_Store
+.hindent.yaml
 debug.txt
 Setup.hs
 insert-molecule.cabal
