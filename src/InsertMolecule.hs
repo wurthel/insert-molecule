@@ -454,17 +454,18 @@ readMolecule :: FilePath -> IO Molecule
 readMolecule inf = return $ foldr addAtom newMolecule atoms
   where
     txt = unsafePerformIO $ StrictIO.readFile inf
+    strip = filter (/= ' ')
+    rfld f s e = f . drop (s - 1) . take e
     atoms =
-      [ (id, Atom elem etype resname resseq coordin radius)
+      [ (serial, Atom elem etype resname resseq coordin radius)
       | line <- lines txt
-      , (List.head . List.words $ line) `List.elem` ["ATOM", "HETATM"]
-      , let fields = words line
-            id = ID $ read $ fields !! 1
-            etype = Type $ fields !! 2
-            elem = Element $ take 1 $ fields !! 2
-            resname = Resname $ fields !! 3
-            resseq = Resseq $ read $ fields !! 5
-            coordin = (read $ fields !! 6, read $ fields !! 7, read $ fields !! 8)
+      , rfld strip 1 6 line `List.elem` ["ATOM", "HETATM"]
+      , let serial = ID $ rfld read 7 11 line
+            etype = Type $ rfld strip 13 16 line
+            elem = Element $ rfld (take 1 . strip) 13 16 line
+            resname = Resname $ rfld strip 18 20 line
+            resseq = Resseq $ rfld read 23 26 line
+            coordin = (rfld read 31 38 line, rfld read 39 46 line, rfld read 47 54 line)
             radius = vdwr elem
       ]
 
@@ -488,7 +489,9 @@ writeMolecule ouf (!molecule) = do
           occupan = 0.0 :: Double
           tempfac = 0.0 :: Double
           pattern = "%-6s%5d %4s%1c%3s %1c%4d%1c   %8.3f%8.3f%8.3f%6.2f%6.2f\n"
-       in hPrintf hdl pattern
+       in hPrintf
+            hdl
+            pattern
             record
             serial
             atype
