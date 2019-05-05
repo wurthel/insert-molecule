@@ -1,12 +1,17 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-|
+Module      : InsertMolecule
+Copyright   : (c) Vusal Salmanov, 2019
+Maintainer  : salmanov.vh@gmail.com
+Stability   : experimental
+
+Модуль описывает работу с функциями, осуществляющими вставку.
+-}
+
 {-# LANGUAGE BangPatterns #-}
 
 module InsertMolecule
   ( setAtomWithOutOptimization
   , setAtomWithOptimization
-  , readMolecule
-  , readZMolecule
-  , writeMolecule
   ) where
 
 import Control.Category
@@ -31,16 +36,20 @@ import System.Process (callCommand)
 import Text.Printf
 import Text.Read (readMaybe)
 
+import Parser
+import TrigonometryDegree
 import Types
-import Utils
 
--- | НАЧАЛО. ВСТАВКА МОЛЕКУЛЫ.
 -- | Функция предназначена для последовательной вставки
--- @n@ атомов молекулы из @zmatr@, находящихся в строках [1, n],
--- без процесса оптимизации.
+-- @n@ атомов молекулы в @z-matrix@ представлении, находящихся в строках [1, n] (нумерация с 0),
+-- без проведения процесса оптимизации.
 -- В качестве результата возвращается первая молекулу, в которую удалось
--- вставить @n@ атомов. Если такой молекулы не нашлось, то возвращается Nothing
-setAtomWithOutOptimization :: Int -> ZMolecule -> Molecule -> Maybe Molecule
+-- вставить @n@ атомов. Если такой молекулы не нашлось, то возвращается Nothing.
+setAtomWithOutOptimization ::
+     Int -- ^ Число вставляемых атомов
+  -> ZMolecule -- ^ Вставляемая молекула в @z-matrix@ представлении
+  -> Molecule -- ^ Молекула, в которую производится вставка.
+  -> Maybe Molecule -- ^ Молекула со вставленными атомами.
 setAtomWithOutOptimization 0 _ mol = pure mol
 setAtomWithOutOptimization n zmatr mol =
   listToMaybe $ setAtomWithOutOptimization' 1 n zmatr mol newMolecule
@@ -62,15 +71,20 @@ setAtomWithOutOptimization n zmatr mol =
         setAtomWithOutOptimization3 m zmatr mol insMol
 
 -- | Функция предназначена для последовательной вставки
--- атомов молекулы из @zmatr@, находящихся в строках [s, e],
--- c процессом оптимизации. В качестве результата возвращается
--- молекула после всех вставок
+-- атомов молекулы из @zmatr@, находящихся в строках [s, e] (нумерация с 0),
+-- c проведением процесса оптимизации. В качестве результата возвращается
+-- молекула после со вставленными атомами.
 setAtomWithOptimization ::
-     (FilePath, FilePath, FilePath, FilePath, FilePath)
-  -> (Int, Int)
-  -> ZMolecule
-  -> Molecule
-  -> IO Molecule
+     (FilePath, FilePath, FilePath, FilePath, FilePath) -- ^ Вспомогательные файлы для работы оптимизатора. Порядок файлов в кортеже следующий:
+                                                        -- 1. оптимизируемая молекула; 
+                                                        -- 2. файл с указанием @resid@, которые будет использовать оптимизатор в процессе своей работы
+                                                        -- 3. папка, где лежит оптимизатор;
+                                                        -- 4. скрипт, производящий оптимизацию;
+                                                        -- 5. оптимизированная молекула, результат работы оптимизатора
+  -> (Int, Int) -- ^ Первый и последний вставляемые атомы.
+  -> ZMolecule -- ^ Вставляемая молекула в @z-matrix@ представлении
+  -> Molecule -- ^ Молекула, в которую производится вставка.
+  -> IO Molecule -- ^ Молекула со вставленными атомами.
 setAtomWithOptimization fns (s, e) zmatr mol
   | s < 0 || e < 0 = error "setAtomWithOptimization: @s@ and @e@ must be great than 0"
   | s > e = return mol
@@ -78,7 +92,7 @@ setAtomWithOptimization fns (s, e) zmatr mol
     mol' <- setAtomWithOptimization3 fns s zmatr mol
     mol' `seq` setAtomWithOptimization fns ((s + 1), e) zmatr mol'
 
--- | Функция предназначена для вставки
+-- Функция предназначена для вставки
 -- первого атома молекулы из @ZMolecule@ без процесса оптимизации.
 -- Возвращает ВСЕ возможные варианты молекул со вставкой.
 -- Если таковых нет, то возвращается пустой список.
@@ -93,7 +107,7 @@ setAtomWithOutOptimization1 n zMol originMol insMol = do
         fromMaybe (error "setAtomWithOutOptimization1: atom_A not found") $
         originMol Map.!? atomID_A
       (x_A, y_A, z_A) = get coordin atom_A
-        -- | Отбираем только те молекулы, который находятся в окрестности @atom_A@.
+        -- Отбираем только те молекулы, который находятся в окрестности @atom_A@.
         -- Для дальнейшего рассмотрения удаляем из рассмотрения тот атом,
         -- с которым связан прикрепляемый атом (то есть удаляем @atom_A@)
       m = 2
@@ -104,8 +118,8 @@ setAtomWithOutOptimization1 n zMol originMol insMol = do
       ws = sortCoordinates [r1, r2, r3, r4]
       wsMolecule =
         Map.elems $ Map.filter (`isInWorkSpace` ws) $ Map.delete atomID_A originMol
-        -- | Вставляем @atom_B@ в @molecule@
-        -- | Функция, задающая координаты атома @atom_B@ в единой СК
+        -- Вставляем @atom_B@ в @molecule@
+        -- Функция, задающая координаты атома @atom_B@ в единой СК
         -- по углам alpha и beta в штрихованной СК.
       possibleCoord a b =
         let x_B = distance_AB * cosd (a) * sind (b) + x_A
@@ -119,7 +133,7 @@ setAtomWithOutOptimization1 n zMol originMol insMol = do
     filter (\x -> not . or $ isIntersection <$> wsMolecule <*> pure x) allVariance
   return $ Map.insert atomID_B goodVariance insMol
 
--- | Функция предназначена для вставки
+-- Функция предназначена для вставки
 -- второго атома молекулы из @ZMolecule@ без процесса оптимизации.
 -- Вовзращает ВСЕ возможные варианты молекул со вставкой.
 -- Если таковых нет, то возвращается пустой список.
@@ -145,7 +159,7 @@ setAtomWithOutOptimization2 n zMol originMol insMol = do
       (x_A, y_A, z_A) = get coordin atom_A
       (x_B, y_B, z_B) = get coordin atom_B
       distance_AB = sqrt $ (x_B - x_A) ^ 2 + (y_B - y_A) ^ 2 + (z_B - z_A) ^ 2
-        -- | Отбираем только те молекулы, которые находятся в окрестности @atom_B@.
+        -- Отбираем только те молекулы, которые находятся в окрестности @atom_B@.
         -- Для дальнейшего рассмотрения удаляем из рассмотрения тот атом,
         -- с которым связан прикрепляемый атом (то есть удаляем @atom_B@)
       m = 2
@@ -156,7 +170,7 @@ setAtomWithOutOptimization2 n zMol originMol insMol = do
       ws = sortCoordinates [r1, r2, r3, r4]
       wsMolecule =
         Map.elems $ Map.filter (`isInWorkSpace` ws) $ Map.delete atomID_B originMol
-        -- | Ищем углы трансляции. Система координат левая.
+        -- Ищем углы трансляции. Система координат левая.
         -- Поэтому положительным углам соответствует вращение по часовой стрелке.
         -- b1 - угол поворота вокруг оси Z
         -- b2 - угол поворота вокруг оси Y
@@ -174,8 +188,8 @@ setAtomWithOutOptimization2 n zMol originMol insMol = do
           xy = sqrt $ x'_B ^ 2 + y'_B ^ 2
           xyz = distance_AB
           (x'_B, y'_B, z'_B) = (x_B - x_A, y_B - y_A, z_B - z_A)
-        -- | Вставляем @atom_C@ в @molecule@
-        -- | Функция, задающая координаты атома @atom_C@  в единой СК
+        -- Вставляем @atom_C@ в @molecule@
+        -- Функция, задающая координаты атома @atom_C@  в единой СК
         -- по углу alpha в дважды штрихованной СК.
       possibleCoord a =
         let h = distance_BC * sind (angle_ABC)
@@ -198,7 +212,7 @@ setAtomWithOutOptimization2 n zMol originMol insMol = do
     filter (\x -> not . or $ isIntersection <$> wsMolecule <*> pure x) allVariance
   return $ Map.insert atomID_C goodVariance insMol
 
--- | Функция предназначена для вставки
+-- Функция предназначена для вставки
 -- третьего и всех последующих атомов молекулы из @ZMolecule@ без процесса оптимизации.
 -- Вовзращает ОДИН возможный вариант молекулы со вставкой.
 -- Если такового нет, то возвращается пустой список.
@@ -232,7 +246,7 @@ setAtomWithOutOptimization3 n zMol originMol insMol = do
       (x_B, y_B, z_B) = get coordin atom_B
       (x_C, y_C, z_C) = get coordin atom_C
       distance_BC = sqrt $ (x_C - x_B) ^ 2 + (y_C - y_B) ^ 2 + (z_C - z_B) ^ 2
-        -- | Отбираем только те молекулы, который находятся в окрестности @atom_B@.
+        -- Отбираем только те молекулы, который находятся в окрестности @atom_B@.
         -- Для дальнейшего рассмотрения удаляем из рассмотрения тот атом,
         -- с которым связан прикрепляемый атом (то есть удаляем @atom_B@)
         -- !!! На самом деле здесь следует удалять из рассмотреия все атомы, с которыми связан вставлямый атом.
@@ -244,7 +258,7 @@ setAtomWithOutOptimization3 n zMol originMol insMol = do
       ws = sortCoordinates [r1, r2, r3, r4]
       wsMolecule =
         Map.elems $ Map.filter (`isInWorkSpace` ws) $ Map.delete atomID_C originMol
-        -- | Ищем углы трансляции. Система координат левая. Упорядоченная тройка (x,y,z).
+        -- Ищем углы трансляции. Система координат левая. Упорядоченная тройка (x,y,z).
         -- Поэтому положительным углам соответствует вращение по часовой стрелке.
         -- b1 - угол поворота вокруг оси Z
         -- b2 - угол поворота вокруг оси Y
@@ -262,7 +276,7 @@ setAtomWithOutOptimization3 n zMol originMol insMol = do
           xy = sqrt $ x'_C ^ 2 + y'_C ^ 2
           xyz = distance_BC
           (x'_C, y'_C, z'_C) = (x_C - x_B, y_C - y_B, z_C - z_B)
-        -- | Найдем координаты @atom_A@ в дважды штрихованной
+        -- Найдем координаты @atom_A@ в дважды штрихованной
         -- системе координат
       x'_A = x_A - x_B
       y'_A = y_A - y_B
@@ -270,7 +284,7 @@ setAtomWithOutOptimization3 n zMol originMol insMol = do
       y''_A = -x'_A * sind (b1) + y'_A * cosd (b1) + 0
       z''_A =
         x'_A * cosd (b1) * sind (b2) + y'_A * sind (b1) * sind (b2) + z'_A * cosd (b2)
-        -- | Определеим угол между осью Z'' и направлением
+        -- Определеим угол между осью Z'' и направлением
         -- связи AB (угол отсчитывается в направлении по часовой стрелке)
       b3
         | yz == 0 = Degree 0
@@ -278,8 +292,8 @@ setAtomWithOutOptimization3 n zMol originMol insMol = do
         | otherwise = -acosd (z''_A / yz)
         where
           yz = sqrt $ y''_A ^ 2 + z''_A ^ 2
-        -- | Вставляем @atom_C@ в @molecule@
-        -- | Функция, задающая координаты атома @atom_C@  в единой СК
+        -- Вставляем @atom_C@ в @molecule@
+        -- Функция, задающая координаты атома @atom_C@  в единой СК
         -- в дважды штрихованной СК.
       possibleCoord =
         let h = distance_BC * sind (angle_BCD)
@@ -301,7 +315,7 @@ setAtomWithOutOptimization3 n zMol originMol insMol = do
     filter (\x -> not . or $ isIntersection <$> wsMolecule <*> pure x) allVariance
   return $ Map.insert atomID_D goodVariance insMol
 
--- | Функция предназначена для вставки
+-- Функция предназначена для вставки
 -- третьего и всех последующих атомов молекулы из @ZMolecule@ с процесом оптимизации.
 -- Вовзращает ОДИН возможный вариант молекулы со вставкой.
 setAtomWithOptimization3 ::
@@ -333,7 +347,7 @@ setAtomWithOptimization3 (mol_of, res_of, opt_path, opt_script, mol_if) n zMol m
       (x_B, y_B, z_B) = get coordin atom_B
       (x_C, y_C, z_C) = get coordin atom_C
       distance_BC = sqrt $ (x_C - x_B) ^ 2 + (y_C - y_B) ^ 2 + (z_C - z_B) ^ 2
-        -- | Ищем углы трансляции. Система координат левая. Упорядоченная тройка (x,y,z).
+        -- Ищем углы трансляции. Система координат левая. Упорядоченная тройка (x,y,z).
         -- Поэтому положительным углам соответствует вращение по часовой стрелке.
         -- b1 - угол поворота вокруг оси Z
         -- b2 - угол поворота вокруг оси Y
@@ -351,7 +365,7 @@ setAtomWithOptimization3 (mol_of, res_of, opt_path, opt_script, mol_if) n zMol m
           xy = sqrt $ x'_C ^ 2 + y'_C ^ 2
           xyz = distance_BC
           (x'_C, y'_C, z'_C) = (x_C - x_B, y_C - y_B, z_C - z_B)
-        -- | Найдем координаты @atom_A@ в дважды штрихованной
+        -- Найдем координаты @atom_A@ в дважды штрихованной
         -- системе координат
       x'_A = x_A - x_B
       y'_A = y_A - y_B
@@ -359,7 +373,7 @@ setAtomWithOptimization3 (mol_of, res_of, opt_path, opt_script, mol_if) n zMol m
       y''_A = -x'_A * sind (b1) + y'_A * cosd (b1) + 0
       z''_A =
         x'_A * cosd (b1) * sind (b2) + y'_A * sind (b1) * sind (b2) + z'_A * cosd (b2)
-        -- | Определеим угол между осью Z и направлением
+        -- Определеим угол между осью Z и направлением
         -- связи AB (угол отсчитывается в направлении по часовой стрелке)
       b3
         | yz == 0 = Degree 0
@@ -367,8 +381,8 @@ setAtomWithOptimization3 (mol_of, res_of, opt_path, opt_script, mol_if) n zMol m
         | otherwise = -acosd (z''_A / yz)
         where
           yz = sqrt $ y''_A ^ 2 + z''_A ^ 2
-        -- | Вставляем @atom_C@ в @molecule@
-        -- | Функция, задающая координаты атома @atom_C@  в единой СК
+        -- Вставляем @atom_C@ в @molecule@
+        -- Функция, задающая координаты атома @atom_C@  в единой СК
         -- по углу alpha в дважды штрихованной СК.
       possibleAtom =
         let h = distance_BC * sind (angle_BCD)
@@ -404,18 +418,18 @@ setAtomWithOptimization3 (mol_of, res_of, opt_path, opt_script, mol_if) n zMol m
     else do
       cur_dir <- getCurrentDirectory
       setCurrentDirectory (cur_dir <> "/" <> opt_path)
-      writeMolecule mol_of molecule'
+      writeMoleculePDB mol_of molecule'
       appendFile res_of (unlines $ (\(Resseq x) -> show x) <$> resSeqForOptim)
       callCommand (opt_script)
       putStrLn "optimization_script: OK"
-      !molecule'' <- readMolecule mol_if
+      !molecule'' <- readMoleculePDB mol_if
         -- removeFile mol_of
         -- removeFile res_of
         -- removeFile mol_if
       setCurrentDirectory cur_dir
       molecule'' `seq` return molecule''
 
--- | Функция сортирует координаты так, чтобы вектора
+-- Функция сортирует координаты так, чтобы вектора
 -- r0r1, r0r2, r0r3 образовывали правую тройку.
 sortCoordinates :: [Point] -> [Point]
 sortCoordinates points =
@@ -424,7 +438,7 @@ sortCoordinates points =
       compZ (_, _, z1) (_, _, z2) = compare z1 z2
    in List.sortBy compZ . List.sortBy compY . List.sortBy compX $ points
 
--- | Функция определяет, находится ли атом в выделенном @[point]@ объеме.
+-- Функция определяет, находится ли атом в выделенном @[point]@ объеме.
 isInWorkSpace :: Atom -> [Point] -> Bool
 isInWorkSpace atom points =
   let r0:r1:r2:r3:_ = points
@@ -436,7 +450,7 @@ isInWorkSpace atom points =
       between x a b = a <= x && x <= b
    in and [between x' x0 x1, between y' y0 y2, between z' z0 z3]
 
--- | Функция принимает два атома и определяет, пересекаются
+-- Функция принимает два атома и определяет, пересекаются
 -- ли их Ван-дер-Вальсовы радиусы. В случае пересечения возвращается True.
 isIntersection :: Atom -> Atom -> Bool
 isIntersection atomA atomB =
@@ -446,98 +460,3 @@ isIntersection atomA atomB =
       (xB, yB, zB) = get coordin atomB
       dist = sqrt $ (xB - xA) ^ 2 + (yB - yA) ^ 2 + (zB - zA) ^ 2
    in dist <= (rA + rB)
-
--- | КОНЕЦ. ВСТАВКА МОЛЕКУЛЫ.
--- | НАЧАЛО. ЧТЕНИЕ, ВЫВОД.
--- | Функция считывает молекулу из файла
-readMolecule :: FilePath -> IO Molecule
-readMolecule inf = return $ foldr addAtom newMolecule atoms
-  where
-    txt = unsafePerformIO $ StrictIO.readFile inf
-    strip = filter (/= ' ')
-    rfld f s e = f . drop (s - 1) . take e
-    atoms =
-      [ (serial, Atom elem etype resname resseq coordin radius)
-      | line <- lines txt
-      , rfld strip 1 6 line `List.elem` ["ATOM", "HETATM"]
-      , let serial = ID $ rfld read 7 11 line
-            etype = Type $ rfld strip 13 16 line
-            elem = Element $ rfld (take 1 . strip) 13 16 line
-            resname = Resname $ rfld strip 18 20 line
-            resseq = Resseq $ rfld read 23 26 line
-            coordin = (rfld read 31 38 line, rfld read 39 46 line, rfld read 47 54 line)
-            radius = vdwr elem
-      ]
-
-writeMolecule :: FilePath -> Molecule -> IO ()
-writeMolecule ouf (!molecule) = do
-  (tmp_name, tmp_handle) <- openTempFile "." "temp"
-  mapM_ (writeAtom tmp_handle) (Map.toList molecule)
-  hClose tmp_handle
-  renameFile tmp_name ouf
-  where
-    writeAtom hdl (id, atom) =
-      let record = "ATOM"
-          (ID serial) = id
-          (Type atype) = get etype atom
-          altLoc = ' '
-          (Resname altName) = get resname atom
-          chainid = 'A'
-          (Resseq resSeq) = get resseq atom
-          icode = ' '
-          (x, y, z) = get coordin atom
-          occupan = 0.0 :: Double
-          tempfac = 0.0 :: Double
-          pattern = "%-6s%5d %4s%1c%3s %1c%4d%1c   %8.3f%8.3f%8.3f%6.2f%6.2f\n"
-       in hPrintf
-            hdl
-            pattern
-            record
-            serial
-            atype
-            altLoc
-            altName
-            chainid
-            resSeq
-            icode
-            x
-            y
-            z
-            occupan
-            tempfac
-
--- | Функция считывает Z-матрицу из файла
-readZMolecule :: FilePath -> IO ZMolecule
-readZMolecule inf = return zmolecule
-  where
-    txt = unsafePerformIO $ StrictIO.readFile inf
-    zmolecule =
-      [ ZAtom atom atomid atomcon bonddist anglcon bondangl dihedcon dihedangl
-      | line <- lines txt
-      , let fields = words line
-            atomid = (readMaybe $ fields !! 0) >>= return . ID
-            atomcon = (readMaybe $ fields !! 1) >>= return . ID
-            bonddist = readMaybe $ fields !! 2
-            anglcon = (readMaybe $ fields !! 3) >>= return . ID
-            bondangl = readMaybe $ fields !! 4
-            dihedcon = (readMaybe $ fields !! 5) >>= return . ID
-            dihedangl = readMaybe $ fields !! 6
-            etype = Type $ fields !! 7
-            elem = Element $ take 1 $ fields !! 7
-            coordin = (0, 0, 0)
-            radius = vdwr elem
-            resname = Resname $ fields !! 8
-            resseq = Resseq $ read $ fields !! 9
-            atom = Atom elem etype resname resseq coordin radius
-      ]
-
--- | Возвращает Ван-дер-Вальсов радиус атома
-vdwr :: Element -> CompAccur
-vdwr (Element e) =
-  case e of
-    "C" -> 2.000 -- // Заменено с 1.782
-    "H" -> 0.200 -- // Заменено с 0.200
-    "N" -> 1.000 -- // Заменено с 1.648
-    "O" -> 1.000 -- // Заменено с 1.510
-    "S" -> 1.000 -- // Заменено с 1.782
--- | КОНЕЦ. ЧТЕНИЕ, ВЫВОД.

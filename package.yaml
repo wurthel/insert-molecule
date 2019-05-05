@@ -22,7 +22,6 @@ dependencies:
 - base >= 4.7 && < 5
 - random
 - directory
-- split
 - containers
 - deepseq
 - strict

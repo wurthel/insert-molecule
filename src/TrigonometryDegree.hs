@@ -1,10 +1,18 @@
+{-|
+Module      : Trigonometry
+Copyright   : (c) Vusal Salmanov, 2019
+Maintainer  : salmanov.vh@gmail.com
+Stability   : experimental
+
+Данный модуль был составлен для работы с тригонометрическими функциями, 
+аргументами которых являются углы в градусах (по-умолчанию тригонометрические
+функции в @Haskell@ работаю c углами в радианах).
+-}
+
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
-module Utils where
+module TrigonometryDegree where
 
--- | НАЧАЛО. ТРИГОНОМЕТРИЯ
--- Предназчен для работы с тригонометрическими фукциями
--- с градусами в аргументе
 newtype Degree a =
   Degree a
   deriving (Num, Enum, Show, Eq, Ord, Fractional)
@@ -29,4 +37,3 @@ acosd = rad2Deg . acos
 
 asind :: Floating a => a -> Degree a
 asind = rad2Deg . asin
--- | КОНЕЦ. ТРИГОНОМЕТРИЯ

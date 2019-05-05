@@ -1,11 +1,11 @@
 — Молекула, в которую производится вставка
-molecule = data/proteins/1M0L.pdb
+molecule_fn = data/proteins/1M0L.pdb
 
 — Результат работы программы
-molecule_result = 1M0L_result.pdb
+molecule_result_fn = 1M0L_result.pdb
 
 — Вставляемая молекула в Z-матричном представлении
-zmolecule = data/zmatrix
+zmolecule_fn = data/zmatrix
 
 — Число первых атомов, вставка которых производится БЕЗ оптимизации
 n_without_opt = 0 
