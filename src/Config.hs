@@ -4,22 +4,22 @@ Copyright   : (c) Vusal Salmanov, 2019
 Maintainer  : salmanov.vh@gmail.com
 Stability   : experimental
 
-Данный модуль описывает конфигурационный файл программы.
+This module describes the configuration file of the program.
 -}
 
 module Config
   ( 
-  -- * Основные параметры
+  -- * Main settings
     zmolecule_fn
   , molecule_fn
   , molecule_result_fn
   , n_without_opt
   , n_with_opt
 
-  -- * Оптимизатор
+  -- * Optimizer
   , opt_path
   , opt_script
-  , opt_mol_beh
+  , opt_mol_bef
   , opt_mol_aft
   , opt_resid
   ) where
@@ -38,7 +38,7 @@ readConfig =
         let config_fn = head args
         readFile config_fn
    in [ (key, val)
-      | line <- filter (\x -> not ("--" `isPrefixOf` x) && x /= "") . lines $ s
+      | line <- filter (\x -> not ("#" `isPrefixOf` x) && x /= "") . lines $ s
       , let (key, val) = (\x -> (head x, unwords . drop 2 $ x)) . words $ line
       ]
 
@@ -48,43 +48,43 @@ get key f =
     Nothing -> error ("get: not found: " ++ key)
     Just x -> f x
 
--- | Файла, описывающий вставляемую молекулу в @z-matrix@ представлении.
+-- | A file describing the molecule to be inserted in the @ z-matrix @ representation.
 zmolecule_fn :: String
 zmolecule_fn = get "zmolecule_fn" id
 
--- | Файла, описывающий вставляемую молекулу.
+-- | A file describing the molecule to be inserted.
 molecule_fn :: String
 molecule_fn = get "molecule_fn" id
 
--- | Файла, куда будет записана полученная в результате работы программ молекула.
+-- | The file where the molecule resulting from the programs will be written to.
 molecule_result_fn :: String
 molecule_result_fn = get "molecule_result_fn" id
 
--- | Число атомов, которое вставляется без проведения процесса оптимизации.
+-- | The number of atoms that is inserted without the optimization process.
 n_without_opt :: Int
 n_without_opt = get "n_without_opt" read
 
--- | Диапозон атомов, которые вставляются с проведением процесса оптимизации.
+-- | The range of atoms that are inserted with the optimization process.
 n_with_opt :: (Int, Int)
 n_with_opt = get "n_with_opt" read
 
--- | Папке, где лежит оптимизатор и вспомогательные файлы.
+-- | The folder with optimizer and auxiliary files lie.
 opt_path :: String
 opt_path = get "opt_path" id
 
--- | Скрипт, запускающий оптимизацию.
+-- | Optimizer.
 opt_script :: String
 opt_script = get "opt_script" id
 
--- | Файл оптимизируемой молекулы.
-opt_mol_beh :: String
-opt_mol_beh = get "opt_mol_beh" id
+-- | Molecule file before optimizatin.
+opt_mol_bef :: String
+opt_mol_bef = get "opt_mol_bef" id
 
--- | Файл оптимизированной молекулы.
+-- | Optimized molecule file.
 opt_mol_aft :: String
 opt_mol_aft = get "opt_mol_aft" id
 
--- | Файл, где будут указываться @resid@, которые будет использовать оптимизатор
--- в процессе своей работы.
+-- | The file where @resid@ will be specified, 
+-- which will be used by the optimizer in its work.
 opt_resid :: String
 opt_resid = get "opt_resid" id

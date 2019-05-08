@@ -4,8 +4,8 @@ Copyright   : (c) Vusal Salmanov, 2019
 Maintainer  : salmanov.vh@gmail.com
 Stability   : experimental
 
-Этот модуль содержит описание вспомогательных типов,
-используемых программой. 
+This module contains the description of
+auxiliary types used by the program.
 -}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
@@ -19,41 +19,42 @@ import qualified Data.Map as Map
 import Prelude hiding ((.), id)
 
 -- * Типы данных
--- | Данный тип предназначен для указания номера атома в 'Molecule'.
+-- | This type is intended to indicate the number of an atom in the 'Molecule'.
 newtype ID =
   ID Int
   deriving (Num, Enum, Eq, Ord, Show)
 
--- | Данный тип предназначен для указания типа атома в 'Atom'.
+-- | This type is intended to indicate the type of atom in 'Atom'.
 newtype Type =
   Type String
   deriving (Show)
 
--- | Данный тип предназначен для указания имени атомного элемента в 'Atom'.
+-- | This type is intended to indicate the type of atom in 'Atom'.
 newtype Element =
   Element String
   deriving (Show)
 
--- | Данный тип предназначен для указания полного именени атома (какой
--- он имел в исходной молекуле) в 'Atom'.
+-- | This type is intended to indicate the full name of the atom
+-- (which it had in the original molecule) in 'Atom'.
 newtype Resname =
   Resname String
   deriving (Show)
 
--- | Данный тип предназначен для указания номера аминоксилоты,
--- которой принадлежит атом в исходной молекуле, в 'Atom'.
+-- | This type is intended to indicate the number of amino acid
+-- to which the atom in the parent molecule belongs, in 'Atom'.
 newtype Resseq =
   Resseq Int
   deriving (Num, Enum, Eq, Ord, Show)
 
--- | Данный тип предназначен для указания @XYZ@ координат атома в 'Atom'.
+-- | This type is intended to indicate the @XYZ@ coordinates 
+-- of the atom in 'Atom'.
 type Point = (Double, Double, Double)
 
--- | Данный тип предназначен для указания Ван-дер-Ваальсова
--- радиуса атома в 'Atom'.
+-- | This type is intended to specify the Van-der-Waals 
+-- radius of the atom in 'Atom'.
 type Radius = Double
 
--- | Данный тип описывает структуру @Atom@.
+-- | This type describes the structure of @Atom@.
 data Atom =
   Atom
     { _elem :: Element
@@ -65,7 +66,8 @@ data Atom =
     }
   deriving (Show)
 
--- | Данный тип описывает структуру одного атома в @z-matrix@.
+-- | This type describes the structure of a single atom
+-- in the @z-matrix@ representation.
 data ZAtom =
   ZAtom
     { _atom :: Atom
@@ -79,16 +81,16 @@ data ZAtom =
     }
   deriving (Show)
 
--- | Данный тип описывает молекулу, составленной из 'Atom'.
+-- | This type describes a molecule.
 type Molecule = Map.Map ID Atom
 
--- | Данный тип описывает молекулы в @z-matrix@ представлении.
+-- | This type describes molecules in the @z-matrix@ representation.
 type ZMolecule = [ZAtom]
 
 mkLabels [''Atom, ''ZAtom]
 
--- * Конструкторы пустых объектов
--- | Функция создает новый 'Atom' без каких-либо характеристик
+-- * Empty object constructors.
+-- | The function creates a new 'Atom' without any characteristics.
 -- 
 -- >>> newAtom
 -- Atom  { _elem = Element "", 
@@ -108,15 +110,15 @@ newAtom =
     , _radius = 0
     }
 
--- | Функция создает пустую 'Molecule' 
+-- | The function creates an empty 'Molecule'
 -- 
 -- >>> newMolecule
 -- fromList []
 newMolecule :: Molecule
 newMolecule = Map.empty
 
--- | Функция создает пустую пустой 'Atom' в @z-matrix@ представлени
--- без каких-либо характеристик. 
+-- | The function creates an empty empty 'Atom' in the @z-matrix@ 
+-- representation without any characteristics.
 -- 
 -- >>> newZAtom
 -- ZAtom {_atom = 
@@ -124,7 +126,7 @@ newMolecule = Map.empty
 --                _etype = Type "", 
 --                _resname = Resname "",
 --                _resseq = Resseq 0, 
---                _coordin = (0.0,0.0,0.0), 
+--                _coord = (0.0,0.0,0.0), 
 --                _radius = 0.0}, 
 --        _atomid = Nothing, 
 --        _atomcon = Nothing, 
@@ -146,13 +148,13 @@ newZAtom =
     , _dihedangl = Nothing
     }
 
--- | Функция создает пустую 'Molecule' в @z-matrix@ представлении
+-- | The function creates an empty 'Molecule' in the @z-matrix@ representation.
 -- 
 -- >>> newZMolecule
 -- []
 newZMolecule :: ZMolecule
 newZMolecule = mempty
 
--- | Функция вставляет 'Atom' с указанным 'ID' в 'Molecule'.
+-- | The function inserts 'Atom' with the specified 'ID' into the 'Molecule'.
 addAtom :: (ID, Atom) -> Molecule -> Molecule
 addAtom (id, atom) = Map.insert id atom
