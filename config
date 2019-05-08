@@ -1,29 +1,29 @@
-— Молекула, в которую производится вставка
+# The molecule into which the insertion is made
 molecule_fn = data/proteins/1M0L.pdb
 
-— Результат работы программы
+# The result of the program
 molecule_result_fn = 1M0L_result.pdb
 
-— Вставляемая молекула в Z-матричном представлении
+# Inserted molecule in Z-matrix representation
 zmolecule_fn = data/zmatrix
 
-— Число первых атомов, вставка которых производится БЕЗ оптимизации
-n_without_opt = 0 
+# The number of first atoms that are inserted without optimization
+n_without_opt = 0
 
-— Диапазон атомов, вставка которых производится С оптимизацией
+# The range of atoms that are inserted with optimization
 n_with_opt = (1, 21)
 
-— | Путь к скрипту с оптимизацией
+# Optimization script path
 opt_path = optimization-script/
 
-— | Скрипт, запускающий оптимизацию
+# Optimization Script
 opt_script = bash relax.sh
 
-— | PDB файл оптимизируемой молекулы
-opt_mol_beh = 1M0L.pdb
+# PDB file of an optimized molecule
+opt_mol_bef = 1M0L.pdb
 
-— | PDB файл оптимизированной молекулы
+# PDB file optimized molecule
 opt_mol_aft = 1M0L_0.pdb
 
-— | Файла, куда выводятся требующие оптимизации аминокислоты
+# File where the amino acids that require optimization are displayed
 opt_resid = N

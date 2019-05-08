@@ -16,11 +16,11 @@ insertMolecule = do
   molecule <- readMoleculePDB molecule_fn
   let n = n_without_opt
       se = n_with_opt
-      fns = (opt_mol_beh, opt_resid, opt_path, opt_script, opt_mol_aft)
+      fns = (opt_mol_bef, opt_resid, opt_path, opt_script, opt_mol_aft)
   mapM_
     ((\fn -> join $ when <$> doesFileExist fn <*> pure (removeFile fn)) .
      (opt_path <>))
-    [opt_mol_beh, opt_resid, opt_mol_aft]
+    [opt_mol_bef, opt_resid, opt_mol_aft]
   let molecule' =
         fromMaybe (error "insertMolecule: returned Nothing") $
         setAtomWithOutOptimization n zmolecule molecule

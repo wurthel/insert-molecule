@@ -4,9 +4,9 @@ Copyright   : (c) Vusal Salmanov, 2019
 Maintainer  : salmanov.vh@gmail.com
 Stability   : experimental
 
-Данный модуль был составлен для работы с тригонометрическими функциями, 
-аргументами которых являются углы в градусах (по-умолчанию тригонометрические
-функции в @Haskell@ работаю c углами в радианах).
+This module was designed to work with trigonometric functions
+whose arguments are angles in degrees (by default trigonometric
+functions in @Haskell@ works with angles in radians).
 -}
 
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
