@@ -18,7 +18,7 @@ import Data.Label
 import qualified Data.Map as Map
 import Prelude hiding ((.), id)
 
--- * Типы данных
+-- * Types
 -- | This type is intended to indicate the number of an atom in the 'Molecule'.
 newtype ID =
   ID Int

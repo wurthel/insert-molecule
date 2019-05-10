@@ -4,8 +4,7 @@ Copyright   : (c) Vusal Salmanov, 2019
 Maintainer  : salmanov.vh@gmail.com
 Stability   : experimental
 -}
-module Parser
-  
+module IO
   ( 
     -- * Read
     readMoleculePDB

@@ -35,7 +35,7 @@ import System.Process (callCommand)
 import Text.Printf
 import Text.Read (readMaybe)
 
-import Parser
+import IO
 import TrigonometryDegree
 import Types
 
