@@ -17,7 +17,7 @@ To build Moo with Stackage dependencies, use the `stack` tool:
 [![Build Status](https://travis-ci.org/wurthel/insert-molecule.svg?branch=master)](https://travis-ci.org/wurthel/insert-molecule)
 
 ### To run
-------
+----------
 To run the programm: 
 `stack exec insert-molecule-exe config`
 where `config` is configuration file.
