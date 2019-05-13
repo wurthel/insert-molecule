@@ -1,9 +1,18 @@
 .stack-work
 .DS_Store
 .hindent.yaml
-debug.txt
+.gitignore
+config
 Setup.hs
 insert-molecule.cabal
+
+data/proteins/*
+!data/proteins/1M0L.pdb
+data/results/*
+!data/results/1M0L-result.pdb
+data/zmatrixs/*
+!data/zmatrixs/README.md
+!data/zmatrixs/zmatrix
 
 optimization-script/*
 !optimization-script/create.pgn
