@@ -584,9 +584,9 @@ cat C16-1 >> 1M0L_0.pdb
 
 sed -i "s/$rename/REL/g" 1M0L_0.pdb
 
-sed -i "s/${ces}/4002/g" 1M0L_0.pdb
-sed -i "s/${cds}/4001/g" 1M0L_0.pdb
-sed -i "s/${cgs}/4000/g" 1M0L_0.pdb
+sed -i "s/${ces}/8002/g" 1M0L_0.pdb
+sed -i "s/${cds}/8001/g" 1M0L_0.pdb
+sed -i "s/${cgs}/8000/g" 1M0L_0.pdb
 
 
 rm NZ-1 C15-1 C14-1 C13-1 C20-1 C12-1 C11-1 C10-1 C9-1 C19-1 C8-1 C7-1 C6-1 C5-1 C4-1 C3-1 C2-1 C1-1 C18-1 C17-1 C16-1
