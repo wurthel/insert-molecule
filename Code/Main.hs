@@ -1,11 +1,12 @@
 module Main where
 
-import Config
 import Control.Monad
 import Data.Maybe (fromMaybe)
-import IO
-import InsertMolecule
 import System.Directory (doesFileExist, removeFile)
+
+import InsertMolecule.Config
+import InsertMolecule.ReadWrite
+import InsertMolecule.InsertMolecule
 
 main :: IO ()
 main = do

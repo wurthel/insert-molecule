@@ -4,7 +4,7 @@ Copyright   : (c) Vusal Salmanov, 2019
 Maintainer  : salmanov.vh@gmail.com
 Stability   : experimental
 -}
-module IO
+module InsertMolecule.ReadWrite
   ( 
     -- * Read
     readMoleculePDB
@@ -27,7 +27,7 @@ import System.IO
 import Text.Printf (hPrintf)
 import Text.Read (readMaybe)
 
-import Types
+import InsertMolecule.Types
 
 -- | Read molecule in PDB format.
 readMoleculePDB :: FilePath -> IO Molecule

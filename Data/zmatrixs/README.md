@@ -8,5 +8,5 @@ a0		a1			a2			a3			a4		a5			a6		  a7	a8		a9
 
 3345 	Nothing		Nothing		Nothing		Nothing	Nothing		Nothing	  CA	REL		212
 8000 	3345		1.46		Nothing		Nothing	Nothing		Nothing	  NA    REL		212
-8001	8000		1.33		3345		124.50	Nothing		Nothing	  CA	REL		212
-8002	8001		1.38		8000		122.57	3345		-162.50	  CA	REL		212
+8001	8000		1.33		3345		124.50	Nothing		Nothing	  CB	REL		212
+8002	8001		1.38		8000		122.57	3345		-162.50	  CD	REL		212

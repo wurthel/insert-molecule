@@ -11,7 +11,7 @@ auxiliary types used by the program.
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# OPTIONS_HADDOCK prune#-}
 
-module Types where
+module InsertMolecule.Types where
 
 import Control.Category
 import Data.Label

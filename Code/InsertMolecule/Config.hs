@@ -7,7 +7,7 @@ Stability   : experimental
 This module describes the configuration file of the program.
 -}
 
-module Config
+module InsertMolecule.Config
   ( 
   -- * Main settings
     zmolecule_fn
