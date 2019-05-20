@@ -29,12 +29,12 @@ dependencies:
 - process
 
 library:
-  source-dirs: src
+  source-dirs: Code
 
 executables:
   insert-molecule-exe:
     main:                Main.hs
-    source-dirs:         app
+    source-dirs:         Code
     ghc-options:
     - -threaded
     - -rtsopts

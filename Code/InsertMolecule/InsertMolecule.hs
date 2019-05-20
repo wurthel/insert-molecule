@@ -8,7 +8,7 @@ The module describes the work with functions that perform the insertion.
 -}
 {-# LANGUAGE BangPatterns #-}
 
-module InsertMolecule
+module InsertMolecule.InsertMolecule
   ( setAtomWithOutOptimization
   , setAtomWithOptimization
   ) where
@@ -35,9 +35,9 @@ import System.Process (callCommand)
 import Text.Printf
 import Text.Read (readMaybe)
 
-import IO
-import TrigonometryDegree
-import Types
+import InsertMolecule.ReadWrite
+import InsertMolecule.TrigDegree
+import InsertMolecule.Types
 
 -- | The function is intended for the sequential insertion 
 -- of n atoms of the molecule in the z-matrix representation, 
