@@ -427,9 +427,6 @@ setAtomWithOptimization3 (mol_of, res_of, opt_path, opt_script, mol_if) n zMol m
       callCommand opt_script
       putStrLn "optimization_script: OK"
       molecule'' <- readMoleculePdb mol_if
-      -- removeFile mol_of
-      -- removeFile res_of
-      -- removeFile mol_if
       setCurrentDirectory cur_dir
       return molecule''
 
@@ -489,3 +486,4 @@ vdwr atom =
       "N" -> 1.200 -- Заменено с 1.648. Радиус в PDB 1.400
       "C" -> 1.200 -- Заменено с 1.782. Радиус в PDB 1.500
       "S" -> 1.900 -- Заменено с 1.782. Радиус в PDB 1.900
+      otherwise -> error ("vdwr: atom " ++ show e ++ "not found") 
