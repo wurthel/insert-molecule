@@ -27,6 +27,8 @@ dependencies:
 - strict
 - fclabels
 - process
+- lens
+- hmatrix
 
 library:
   source-dirs: Code

@@ -4,6 +4,8 @@ import Control.Monad
 import Data.Maybe (fromMaybe)
 import System.Directory (doesFileExist, removeFile)
 
+import qualified Data.Map as Map
+import Control.Lens
 import InsertMolecule.Config
 import InsertMolecule.ReadWrite
 import InsertMolecule.InsertMolecule
@@ -20,9 +22,9 @@ main = do
       se = n_with_opt
       fns = (opt_mol_bef, opt_resid, opt_path, opt_script, opt_mol_aft)
   zmolecule <- readZMolecule zmolecule_fn
-  molecule <- readMoleculePDB molecule_fn
+  molecule <- readMoleculePdb molecule_fn
   let molecule' =
         fromMaybe (error "insertMolecule: returned Nothing") $
         setAtomWithOutOptimization n zmolecule molecule
   molecule'' <- setAtomWithOptimization fns se zmolecule molecule'
-  writeMoleculePDB molecule_result_fn molecule''
+  writeMoleculePdb molecule_result_fn molecule''

@@ -26,6 +26,9 @@ addons:
   apt:
     packages:
       - libgmp-dev
+      - libblas-dev
+      - liblapack-dev
+      - libgsl-dev
 
 before_install:
 # Download and unpack the stack executable
