@@ -101,6 +101,9 @@ readZMolecule inf = do
               vangl = read $ fields !! 4
               dcon = read $ fields !! 5
               dangl = read $ fields !! 6
-              atom = newAtom
+              nm = fields !! 7
+              rsnm = fields !! 8
+              rssq = read $ fields !! 9
+              atom = newAtom { _aname = nm, _aresname = rsnm, _aresseq = rssq}
         ]
   return zatoms

@@ -50,6 +50,7 @@ data ZAtom = ZAtom
   , _dihcon :: Int
   , _dihangl :: Double
   }
+  deriving (Show)
 
 newZAtom :: ZAtom
 newZAtom = ZAtom 
