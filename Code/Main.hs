@@ -20,11 +20,12 @@ main = do
   -- Computing
   let n = n_without_opt
       se = n_with_opt
+      skip = skip_opt
       fns = (opt_mol_bef, opt_resid, opt_path, opt_script, opt_mol_aft)
   zmolecule <- readZMolecule zmolecule_fn
   molecule <- readMoleculePdb molecule_fn
   let molecule' =
         fromMaybe (error "insertMolecule: returned Nothing") $
         setAtomWithOutOptimization n zmolecule molecule
-  molecule'' <- setAtomWithOptimization fns se zmolecule molecule'
+  molecule'' <- setAtomWithOptimization fns se skip zmolecule molecule'
   writeMoleculePdb molecule_result_fn molecule''

@@ -15,6 +15,7 @@ module InsertMolecule.Config
   , molecule_result_fn
   , n_without_opt
   , n_with_opt
+  , skip_opt
 
   -- * Optimizer
   , opt_path
@@ -67,6 +68,9 @@ n_without_opt = get "n_without_opt" read
 -- | The range of atoms that are inserted with the optimization process.
 n_with_opt :: (Int, Int)
 n_with_opt = get "n_with_opt" read
+
+skip_opt :: Int
+skip_opt = get "skip_opt" read
 
 -- | The folder with optimizer and auxiliary files lie.
 opt_path :: String

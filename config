@@ -12,6 +12,7 @@ n_without_opt = 0
 
 # The range of atoms that are inserted with optimization
 n_with_opt = (1, 29)
+skip_opt = 4
 
 # Optimization script path
 opt_path = Optimizer/
