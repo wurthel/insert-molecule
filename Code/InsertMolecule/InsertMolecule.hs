@@ -80,15 +80,16 @@ setAtomWithOptimization ::
                                                         -- (4) script that performs optimization; 
                                                         -- (5) optimized molecule, the result of the optimizer
   -> (Int, Int) -- ^ The first and last atoms to be inserted.
+  -> Int
   -> ZMolecule -- ^ The inserted molecule in the @ z-matrix @ submission&
   -> Molecule -- ^ The molecule in which the insertion is made.
   -> IO Molecule -- ^ Molecule with inserted atoms.
-setAtomWithOptimization fns (s, e) zmatr mol
+setAtomWithOptimization fns (s, e) skip zmatr mol
   | s <= 0 || e <= 0 = error "setAtomWithOptimization: @s@ and @e@ must be great than 0"
   | s > e = return mol
   | otherwise = do
-    mol' <- setAtomWithOptimization3 fns s zmatr mol
-    mol' `seq` setAtomWithOptimization fns (s + 1, e) zmatr mol'
+    mol' <- setAtomWithOptimization3 fns s skip zmatr mol
+    mol' `seq` setAtomWithOptimization fns (s + 1, e) (skip - 1) zmatr mol'
 
 -- The function is intended to insert the first atom of the 
 -- molecule from @ZMolecule@ without the optimization process.
@@ -324,10 +325,11 @@ setAtomWithOutOptimization3 n zMol originMol insMol = do
 setAtomWithOptimization3 ::
      (FilePath, FilePath, FilePath, FilePath, FilePath)
   -> Int
+  -> Int
   -> ZMolecule
   -> Molecule
   -> IO Molecule
-setAtomWithOptimization3 (mol_of, res_of, opt_path, opt_script, mol_if) n zMol molecule = do
+setAtomWithOptimization3 (mol_of, res_of, opt_path, opt_script, mol_if) n skip zMol molecule = do
   let matrixAtom_D = zMol !! (n-1)
       atomID_D = view atomid matrixAtom_D
       atomID_C = view con matrixAtom_D
@@ -412,14 +414,22 @@ setAtomWithOptimization3 (mol_of, res_of, opt_path, opt_script, mol_if) n zMol m
       r3 = vector [x_D - m * r_D, y_D + m * r_D, z_D - m * r_D]
       r4 = vector [x_D - m * r_D, y_D - m * r_D, z_D + m * r_D]
       ws = sortCoordinates [r1, r2, r3, r4]
-      wsMol = Map.elems $ Map.filter (`isInWorkSpace` ws) $ Map.delete atomID_C molecule'
+      wsMol = Map.elems $ Map.filter (`isInWorkSpace` ws) molecule'
       atomsForOptim = filter (isIntersection possibleAtom) wsMol
       resSeqForOptim =
         List.delete (view aresseq possibleAtom) . List.nub $
         map (view aresseq) atomsForOptim
   
   putStrLn ("Atom " ++ show n ++ " is inserted")
-  if null resSeqForOptim
+
+  -- if n == 4 
+  --   then do
+  --     writeMoleculePdb "tmp.pdb" molecule'
+  --     print wsMol
+  --     return (error "EXIT!")
+  --   else return molecule'
+
+  if null resSeqForOptim || skip > 0
     then return molecule'
     else do
       cur_dir <- getCurrentDirectory
