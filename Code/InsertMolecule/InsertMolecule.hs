@@ -412,11 +412,13 @@ setAtomWithOptimization3 (mol_of, res_of, opt_path, opt_script, mol_if) n zMol m
       r3 = vector [x_D - m * r_D, y_D + m * r_D, z_D - m * r_D]
       r4 = vector [x_D - m * r_D, y_D - m * r_D, z_D + m * r_D]
       ws = sortCoordinates [r1, r2, r3, r4]
-      wsMol = Map.elems $ Map.filter (`isInWorkSpace` ws) molecule'
+      wsMol = Map.elems $ Map.filter (`isInWorkSpace` ws) $ Map.delete atomID_C molecule'
       atomsForOptim = filter (isIntersection possibleAtom) wsMol
       resSeqForOptim =
         List.delete (view aresseq possibleAtom) . List.nub $
         map (view aresseq) atomsForOptim
+  
+  putStrLn ("Atom " ++ show n ++ " is inserted")
   if null resSeqForOptim
     then return molecule'
     else do
@@ -425,7 +427,6 @@ setAtomWithOptimization3 (mol_of, res_of, opt_path, opt_script, mol_if) n zMol m
       writeMoleculePdb mol_of molecule'
       appendFile res_of (unlines $ show <$> resSeqForOptim)
       callCommand opt_script
-      putStrLn "optimization_script: OK"
       molecule'' <- readMoleculePdb mol_if
       setCurrentDirectory cur_dir
       return molecule''
