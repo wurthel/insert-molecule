@@ -1,4 +1,5 @@
 #!/bin/bash
+path_to_namd="/Users/wurthel/Desktop/NAMD/namd2"
 filename='N'
 zamm=1
 while read p; do
@@ -397,7 +398,7 @@ q3=$(cat C3)
 sed "s/xxxx/${Dx}/; s/yyyy/${Dy}/; s/zzzz/${Dz}/; s/aaaa/${q1}/; s/bbbb/${q2}/; s/cccc/${q3}/"  m1.conf > m11.conf
 rm A AA B C1 C2 C3 X1 X2 Z1 Z2 Y1 Y2
 
-/home/wurthel-linux/Desktop/NAMD_2.13_Linux-x86_64-multicore/namd2 m11.conf > m1.log
+$path_to_namd m11.conf > m1.log
 
 vmd -dispdev text -e mout.pgn
 cp 1M0L_0.pdb 1M0L_A.pdb
@@ -587,7 +588,6 @@ sed -i "s/$rename/REL/g" 1M0L_0.pdb
 #sed -i "s/${ces}/8002/g" 1M0L_0.pdb
 #sed -i "s/${cds}/8001/g" 1M0L_0.pdb
 #sed -i "s/${cgs}/8000/g" 1M0L_0.pdb
-
 
 rm NZ-1 C15-1 C14-1 C13-1 C20-1 C12-1 C11-1 C10-1 C9-1 C19-1 C8-1 C7-1 C6-1 C5-1 C4-1 C3-1 C2-1 C1-1 C18-1 C17-1 C16-1
 rm nz_1 c15_1 c14_1 c13_1 c20_1 c12_1 c11_1 c10_1 c9_1 c19_1 c8_1 c7_1 c6_1 c5_1 c4_1 c3_1 c2_1 c1_1 c18_1 c17_1 c16_1

@@ -1,11 +1,11 @@
 # The origin molecule
-molecule_fn = Data/1M0L-exp.pdb
+molecule_fn = Data/1M0L.pdb
 
 # The result
 molecule_result_fn = 1M0L_result.pdb
 
 # The inserted molecule in Z-matrix representation
-zmolecule_fn = Data/zmatrix-1M0L-exp
+zmolecule_fn = Data/zmatrix-1M0L
 
 # The number of first atoms that are inserted without optimization
 n_without_opt = 0
