@@ -4593,6 +4593,49 @@ IC C15 CE *NZ HZ1 0.0000 0.00 180.00 0.00 0.0000
 IC C14 NZ *C15 H15 0.0000 0.00 180.00 0.00 0.0000
 IC C5 C6 C1 C2 0.0000 0.00 0.00 0.00 0.0000
 
+
+RESI REZ         0.43
+GROUP                  
+ATOM NZ   NS2   -0.40  
+ATOM HZ1  HC     0.38  
+ATOM CE   CT2    0.27  
+ATOM HE1  HA     0.09  
+ATOM HE2  HA     0.09  
+GROUP                  
+ATOM CD   CT2   -0.18  
+ATOM HD1  HA     0.09  
+ATOM HD2  HA     0.09
+GROUP
+ATOM CG   CT2   -0.18
+ATOM HG1  HA     0.09
+ATOM HG2  HA     0.09
+GROUP
+ATOM CB   CT2   -0.18
+ATOM HB1  HA     0.09
+ATOM HB2  HA     0.09
+GROUP
+ATOM N    NH1   -0.47
+ATOM HN   H      0.31
+ATOM CA   CT1    0.07
+ATOM HA   HB     0.09
+GROUP
+ATOM C    C      0.51
+ATOM O    O     -0.51
+
+
+
+BOND NZ CE CE CD CD CG CG CB CB CA
+BOND NZ HZ1
+BOND N  HN   N  CA    C  CA
+BOND C  +N   CA HA   CB HB1  CB HB2  CG HG1
+BOND CG HG2  CD HD1  CD HD2  CE HE1  CE HE2
+DOUBLE   O  C
+
+CMAP -C  N  CA  C   N  CA  C  +N
+DONOR HN N
+DONOR HZ1 NZ
+ACCEPTOR O C
+
 RESI REA          1.000
 GROUP                  
 ATOM C15  CC1B   0.37  
@@ -6163,4 +6206,170 @@ CMAP -C  N  CA  C   N  CA  C  +N
 DONOR HN N
 DONOR HZ1 NZ
 ACCEPTOR O C
+
+RESI RAZ         0.41
+GROUP                  
+ATOM CE   CT2    0.27  
+ATOM HE1  HA     0.09  
+ATOM HE2  HA     0.09  
+GROUP                  
+ATOM CD   CT2   -0.18  
+ATOM HD1  HA     0.09  
+ATOM HD2  HA     0.09
+GROUP
+ATOM CG   CT2   -0.18
+ATOM HG1  HA     0.09
+ATOM HG2  HA     0.09
+GROUP
+ATOM CB   CT2   -0.18
+ATOM HB1  HA     0.09
+ATOM HB2  HA     0.09
+GROUP
+ATOM N    NH1   -0.47
+ATOM HN   H      0.31
+ATOM CA   CT1    0.07
+ATOM HA   HB     0.09
+GROUP
+ATOM C    C      0.51
+ATOM O    O     -0.51
+
+BOND CE CD CD CG CG CB CB CA
+BOND N  HN   N  CA    C  CA
+BOND C  +N   CA HA   CB HB1  CB HB2  CG HG1
+BOND CG HG2  CD HD1  CD HD2  CE HE1  CE HE2
+DOUBLE   O  C
+
+CMAP -C  N  CA  C   N  CA  C  +N
+DONOR HN N
+ACCEPTOR O C
+
+RESI RBZ         -0.04
+
+GROUP                  
+ATOM CD   CT2   -0.18  
+ATOM HD1  HA     0.09  
+ATOM HD2  HA     0.09
+GROUP
+ATOM CG   CT2   -0.18
+ATOM HG1  HA     0.09
+ATOM HG2  HA     0.09
+GROUP
+ATOM CB   CT2   -0.18
+ATOM HB1  HA     0.09
+ATOM HB2  HA     0.09
+GROUP
+ATOM N    NH1   -0.47
+ATOM HN   H      0.31
+ATOM CA   CT1    0.07
+ATOM HA   HB     0.09
+GROUP
+ATOM C    C      0.51
+ATOM O    O     -0.51
+
+BOND CD CG CG CB CB CA
+BOND N  HN   N  CA    C  CA
+BOND C  +N   CA HA   CB HB1  CB HB2  CG HG1
+BOND CG HG2  CD HD1  CD HD2  
+DOUBLE   O  C
+
+CMAP -C  N  CA  C   N  CA  C  +N
+DONOR HN N
+ACCEPTOR O C
+
+RESI RCZ         -0.04
+GROUP
+ATOM CG   CT2   -0.18
+ATOM HG1  HA     0.09
+ATOM HG2  HA     0.09
+GROUP
+ATOM CB   CT2   -0.18
+ATOM HB1  HA     0.09
+ATOM HB2  HA     0.09
+GROUP
+ATOM N    NH1   -0.47
+ATOM HN   H      0.31
+ATOM CA   CT1    0.07
+ATOM HA   HB     0.09
+GROUP
+ATOM C    C      0.51
+ATOM O    O     -0.51
+
+BOND CG CB CB CA
+BOND N  HN   N  CA    C  CA
+BOND C  +N   CA HA   CB HB1  CB HB2  CG HG1
+BOND CG HG2    
+DOUBLE   O  C
+
+CMAP -C  N  CA  C   N  CA  C  +N
+DONOR HN N
+ACCEPTOR O C
+
+RESI RDZ         -0.04
+GROUP
+ATOM CB   CT2   -0.18
+ATOM HB1  HA     0.09
+ATOM HB2  HA     0.09
+GROUP
+ATOM N    NH1   -0.47
+ATOM HN   H      0.31
+ATOM CA   CT1    0.07
+ATOM HA   HB     0.09
+GROUP
+ATOM C    C      0.51
+ATOM O    O     -0.51
+
+BOND CB CA
+BOND N  HN   N  CA    C  CA
+BOND C  +N   CA HA   CB HB1  CB HB2  
+DOUBLE   O  C
+
+CMAP -C  N  CA  C   N  CA  C  +N
+DONOR HN N
+ACCEPTOR O C
+
+RESI REZ         -0.04
+GROUP
+ATOM N    NH1   -0.47
+ATOM HN   H      0.31
+ATOM CA   CT1    0.07
+ATOM HA   HB     0.09
+GROUP
+ATOM C    C      0.51
+ATOM O    O     -0.51
+
+BOND N  HN   N  CA    C  CA
+BOND C  +N   CA HA   
+DOUBLE   O  C
+
+CMAP -C  N  CA  C   N  CA  C  +N
+DONOR HN N
+ACCEPTOR O C
+
+RESI RFZ         -0.55
+GROUP
+ATOM N    NH1   -0.47
+ATOM HN   H      0.31
+ATOM CA   CT1    0.07
+ATOM HA   HB     0.09
+GROUP
+ATOM C    C      0.51
+
+BOND N  HN   N  CA    C  CA
+BOND C  +N   CA HA   
+
+CMAP -C  N  CA  C   N  CA  C  +N
+DONOR HN N
+
+RESI RGZ         -0.04
+GROUP
+ATOM N    NH1   -0.47
+ATOM HN   H      0.31
+ATOM CA   CT1    0.07
+ATOM HA   HB     0.09
+
+BOND N  HN   N  CA 
+BOND  CA HA   
+
+CMAP -C  N   N  CA  
+DONOR HN N
 
