@@ -14,12 +14,12 @@ data/zmatrixs/*
 !data/zmatrixs/README.md
 !data/zmatrixs/zmatrix
 
-optimization-script/*
-!optimization-script/create.pgn
-!optimization-script/fixate_ret.pgn
-!optimization-script/m1.conf
-!optimization-script/mout.pgn
-!optimization-script/par_all27_prot_lipid_P.inp
-!optimization-script/relax.sh
-!optimization-script/size.pgn
-!optimization-script/top_all27_prot_lipid_P.inp
+Optimizer/*
+!Optimizer/create.pgn
+!Optimizer/fixate_ret.pgn
+!Optimizer/m1.conf
+!Optimizer/mout.pgn
+!Optimizer/par_all27_prot_lipid_P.inp
+!Optimizer/relax.sh
+!Optimizer/size.pgn
+!Optimizer/top_all27_prot_lipid_P.inp
