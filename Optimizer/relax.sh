@@ -197,7 +197,7 @@ q3=$(cat C3)
 sed "s/xxxx/${Dx}/; s/yyyy/${Dy}/; s/zzzz/${Dz}/; s/aaaa/${q1}/; s/bbbb/${q2}/; s/cccc/${q3}/"  m1.conf > m11.conf
 rm A AA B C1 C2 C3 X1 X2 Z1 Z2 Y1 Y2
 
-/home/wurthel-linux/Desktop/NAMD_2.13_Linux-x86_64-multicore/namd2 +p6 m11.conf > m1.log
+/Users/wurthel/Desktop/NAMD/namd2 +p6 m11.conf > m1.log
 
 vmd -dispdev text -e mout.pgn
 cp 1M0L_0.pdb 1M0L_A.pdb

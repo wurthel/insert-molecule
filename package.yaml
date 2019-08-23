@@ -20,23 +20,25 @@ description:         Please see the README on GitHub at <https://github.com/wurt
 
 dependencies:
 - base >= 4.7 && < 5
-- random
-- directory
-- containers
-- deepseq
 - strict
-- fclabels
-- process
 - lens
 - hmatrix
+- hmatrix-gsl
+- process
+- linear
+- vector
+- matrix
+- mtl
+- containers
+- directory
+- random
 
 library:
-  source-dirs: Code
+  source-dirs: src
 
 executables:
   insert-molecule-exe:
     main:                Main.hs
-    source-dirs:         Code
     ghc-options:
     - -threaded
     - -rtsopts

@@ -5,7 +5,7 @@ molecule_fn = Data/1M0L.pdb
 molecule_result_fn = 1M0L_result.pdb
 
 # The inserted molecule in Z-matrix representation
-zmolecule_fn = Data/zmatrix-1M0L
+zmolecule_fn = Data/zmatrix-1M0L-test
 
 # The number of first atoms that are inserted without optimization
 n_without_opt = 0

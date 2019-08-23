@@ -11,7 +11,7 @@ functions in @Haskell@ works with angles in radians).
 
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
-module InsertMolecule.TrigDegree where
+module Util.TrigDegree where
 
 newtype Degree a =
   Degree a
